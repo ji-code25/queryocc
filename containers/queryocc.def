@@ -1,0 +1,68 @@
+# apptainer.def
+
+Bootstrap: docker
+From: nvidia/cuda:12.6.3-devel-ubuntu22.04
+
+%labels
+    org.opencontainers.image.title "queryocc"
+    org.opencontainers.image.base.name "docker.io/library/nvidia/cuda:12.6.3-devel-ubuntu22.04"
+
+%environment
+    export DEBIAN_FRONTEND=noninteractive
+    export TZ=Europe/Berlin
+    export CUDA_HOME=/usr/local/cuda
+    export PATH=$PATH:/usr/local/cuda/bin
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64
+    # 61: Pascal (local dev) | 75: Turing | 80/86: Ampere (A100/A40) | 89: Ada | 90: Hopper
+    # Used by the JIT-compiled dvr raycaster (RayIoU metrics).
+    export TORCH_CUDA_ARCH_LIST="9.0;8.9;8.6;8.0;7.5;6.1"
+
+%files
+    . /queryocc
+
+%post
+    # Set up environment
+    export DEBIAN_FRONTEND=noninteractive
+    export TZ=Europe/Berlin
+    export CUDA_HOME=/usr/local/cuda
+    export PATH=$PATH:/usr/local/cuda/bin
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64
+    export TORCH_CUDA_ARCH_LIST="9.0;8.9;8.6;8.0;7.5;6.1"
+
+    # System dependencies
+    apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        cmake \
+        curl \
+        ffmpeg \
+        git \
+        libeigen3-dev \
+        openssh-client \
+        python-is-python3 \
+        python3.10-dev \
+        python3-pip \
+        vim-tiny \
+        wget \
+        less \
+        && rm -rf /var/lib/apt/lists/*
+
+    # Upgrade pip and install build tooling.
+    python3.10 -m pip install --no-cache-dir --upgrade pip "setuptools<80" pybind11 ninja
+
+    # Python dependencies (torch pins with cu126 index live in the requirements file).
+    cd /queryocc
+    python3.10 -m pip install --no-cache-dir -r requirements/requirements.txt
+
+    # SSH for GitHub access (if needed)
+    mkdir -p /root/.ssh && ssh-keyscan -t rsa github.com >> /root/.ssh/known_hosts
+
+    # Remove the CUDA forward-compatibility driver libs (only valid on data-center
+    # GPUs; we rely on CUDA minor version compatibility instead).
+    rm -rf /usr/local/cuda/compat
+
+    # Install queryocc itself
+    cd /queryocc
+    python3.10 -m pip install --no-cache-dir -e .
+
+%runscript
+    exec /bin/bash -l

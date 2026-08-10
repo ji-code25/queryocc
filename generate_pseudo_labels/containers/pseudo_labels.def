@@ -1,0 +1,55 @@
+# Apptainer definition for the pseudo-label container — same content as the
+# Dockerfile, for clusters where Docker is unavailable. Build FROM THE
+# PACKAGE ROOT (paths in %files are relative to the build cwd):
+#
+#   cd generate_pseudo_labels
+#   apptainer build --fakeroot pseudo_labels.sif containers/pseudo_labels.def
+#
+# If you have Docker locally, prefer building the Docker image and
+# converting it (containers/build.sh sif-from-docker) — identical result.
+
+Bootstrap: docker
+From: pytorch/pytorch:2.4.0-cuda12.1-cudnn9-devel
+
+%labels
+    org.opencontainers.image.title "generate-pseudo-labels"
+    org.opencontainers.image.description "GroundingDINO+SAM semantics and Metric3D depth pseudo-label generation"
+
+%files
+    ./ /opt/generate_pseudo_labels/generate_pseudo_labels
+
+%environment
+    export PYTHONPATH=/opt/generate_pseudo_labels:$PYTHONPATH
+    export XFORMERS_DISABLED=1
+
+%post
+    set -e
+    export DEBIAN_FRONTEND=noninteractive
+    export TORCH_CUDA_ARCH_LIST="7.0;7.5;8.0;8.6;8.9;9.0"
+    export FORCE_CUDA=1
+    export XFORMERS_DISABLED=1
+
+    apt-get update && apt-get install -y --no-install-recommends \
+        git build-essential ca-certificates libgl1 libglib2.0-0
+    rm -rf /var/lib/apt/lists/*
+
+    pip install --no-cache-dir \
+        -r /opt/generate_pseudo_labels/generate_pseudo_labels/requirements.txt
+
+    # GroundingDINO compiles its CUDA extension here (no GPU needed at build
+    # time thanks to TORCH_CUDA_ARCH_LIST).
+    pip install --no-cache-dir --no-build-isolation \
+        "git+https://github.com/IDEA-Research/GroundingDINO.git"
+    pip install --no-cache-dir \
+        "git+https://github.com/facebookresearch/segment-anything.git"
+
+    # Fail the build loudly if the CUDA extension did not compile.
+    # (torch first: it is what pulls libc10.so into the process.)
+    python -c "import torch; from groundingdino import _C; print('groundingdino CUDA ext: OK')"
+
+%test
+    python -c "import torch, groundingdino, segment_anything, mmengine, timm, nuscenes; print('imports OK')"
+    python -c "import torch; from groundingdino import _C; print('groundingdino CUDA ext: OK')"
+
+%runscript
+    exec python "$@"

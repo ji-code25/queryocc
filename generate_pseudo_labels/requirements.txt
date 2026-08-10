@@ -1,0 +1,17 @@
+# Runtime deps for the pseudo-label generators (torch/torchvision come from
+# the base image). GroundingDINO and segment-anything are installed from git
+# in the container build (see containers/Dockerfile).
+numpy<2
+opencv-python-headless
+Pillow
+tqdm
+huggingface_hub
+# GroundingDINO's text encoder is a HF BERT; it was written against
+# transformers 4.x and does not survive the 5.x API break.
+transformers<5
+# Metric3D (torch.hub) needs mmengine's Config and timm backbone utils
+mmengine
+timm
+# create_infos.py only (kept out of the *training* environment on purpose)
+nuscenes-devkit
+pyquaternion

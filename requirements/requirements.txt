@@ -1,0 +1,24 @@
+--extra-index-url https://download.pytorch.org/whl/cu126
+# cu126 wheels are the last with Pascal (sm_6x) support, needed for local dev GPUs.
+# cu130 drops Pascal and requires driver >= 580.
+torch==2.12.0+cu126
+torchvision==0.27.0+cu126
+lightning>=2.1
+torchmetrics>=0.7.0
+tyro==0.8.5
+wandb>=0.13.3
+zod>=0.5.0  # EgoMotion/LidarData containers used by the nuScenes/AV2 readers
+dataclass-wizard<0.30.0
+nuscenes-devkit>=1.1.1
+av2==0.2.1
+plotly==5.24.1
+kaleido==0.2.1
+jaxtyping
+numpy<2.0.0
+scikit-learn  # PCA for the BEV-features visualization
+scipy
+pre-commit
+pybind11
+einops
+ninja==1.11.1
+huggingface_hub  # hf:// checkpoint specs (tools/release)

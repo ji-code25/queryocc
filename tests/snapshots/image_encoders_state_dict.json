@@ -1,0 +1,1688 @@
+{
+ "cerveza_resnet18_simplefpn_lss": {
+  "image_encoder.backbone.backbone.0.weight": [
+   64,
+   3,
+   7,
+   7
+  ],
+  "image_encoder.backbone.backbone.1.bias": [
+   64
+  ],
+  "image_encoder.backbone.backbone.1.num_batches_tracked": [],
+  "image_encoder.backbone.backbone.1.running_mean": [
+   64
+  ],
+  "image_encoder.backbone.backbone.1.running_var": [
+   64
+  ],
+  "image_encoder.backbone.backbone.1.weight": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.0.bn1.bias": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.0.bn1.num_batches_tracked": [],
+  "image_encoder.backbone.backbone.4.0.bn1.running_mean": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.0.bn1.running_var": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.0.bn1.weight": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.0.bn2.bias": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.0.bn2.num_batches_tracked": [],
+  "image_encoder.backbone.backbone.4.0.bn2.running_mean": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.0.bn2.running_var": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.0.bn2.weight": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.0.conv1.weight": [
+   64,
+   64,
+   3,
+   3
+  ],
+  "image_encoder.backbone.backbone.4.0.conv2.weight": [
+   64,
+   64,
+   3,
+   3
+  ],
+  "image_encoder.backbone.backbone.4.1.bn1.bias": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.1.bn1.num_batches_tracked": [],
+  "image_encoder.backbone.backbone.4.1.bn1.running_mean": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.1.bn1.running_var": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.1.bn1.weight": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.1.bn2.bias": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.1.bn2.num_batches_tracked": [],
+  "image_encoder.backbone.backbone.4.1.bn2.running_mean": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.1.bn2.running_var": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.1.bn2.weight": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.1.conv1.weight": [
+   64,
+   64,
+   3,
+   3
+  ],
+  "image_encoder.backbone.backbone.4.1.conv2.weight": [
+   64,
+   64,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer2.0.bn1.bias": [
+   128
+  ],
+  "image_encoder.backbone.layer2.0.bn1.num_batches_tracked": [],
+  "image_encoder.backbone.layer2.0.bn1.running_mean": [
+   128
+  ],
+  "image_encoder.backbone.layer2.0.bn1.running_var": [
+   128
+  ],
+  "image_encoder.backbone.layer2.0.bn1.weight": [
+   128
+  ],
+  "image_encoder.backbone.layer2.0.bn2.bias": [
+   128
+  ],
+  "image_encoder.backbone.layer2.0.bn2.num_batches_tracked": [],
+  "image_encoder.backbone.layer2.0.bn2.running_mean": [
+   128
+  ],
+  "image_encoder.backbone.layer2.0.bn2.running_var": [
+   128
+  ],
+  "image_encoder.backbone.layer2.0.bn2.weight": [
+   128
+  ],
+  "image_encoder.backbone.layer2.0.conv1.weight": [
+   128,
+   64,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer2.0.conv2.weight": [
+   128,
+   128,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer2.0.downsample.0.weight": [
+   128,
+   64,
+   1,
+   1
+  ],
+  "image_encoder.backbone.layer2.0.downsample.1.bias": [
+   128
+  ],
+  "image_encoder.backbone.layer2.0.downsample.1.num_batches_tracked": [],
+  "image_encoder.backbone.layer2.0.downsample.1.running_mean": [
+   128
+  ],
+  "image_encoder.backbone.layer2.0.downsample.1.running_var": [
+   128
+  ],
+  "image_encoder.backbone.layer2.0.downsample.1.weight": [
+   128
+  ],
+  "image_encoder.backbone.layer2.1.bn1.bias": [
+   128
+  ],
+  "image_encoder.backbone.layer2.1.bn1.num_batches_tracked": [],
+  "image_encoder.backbone.layer2.1.bn1.running_mean": [
+   128
+  ],
+  "image_encoder.backbone.layer2.1.bn1.running_var": [
+   128
+  ],
+  "image_encoder.backbone.layer2.1.bn1.weight": [
+   128
+  ],
+  "image_encoder.backbone.layer2.1.bn2.bias": [
+   128
+  ],
+  "image_encoder.backbone.layer2.1.bn2.num_batches_tracked": [],
+  "image_encoder.backbone.layer2.1.bn2.running_mean": [
+   128
+  ],
+  "image_encoder.backbone.layer2.1.bn2.running_var": [
+   128
+  ],
+  "image_encoder.backbone.layer2.1.bn2.weight": [
+   128
+  ],
+  "image_encoder.backbone.layer2.1.conv1.weight": [
+   128,
+   128,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer2.1.conv2.weight": [
+   128,
+   128,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer3.0.bn1.bias": [
+   256
+  ],
+  "image_encoder.backbone.layer3.0.bn1.num_batches_tracked": [],
+  "image_encoder.backbone.layer3.0.bn1.running_mean": [
+   256
+  ],
+  "image_encoder.backbone.layer3.0.bn1.running_var": [
+   256
+  ],
+  "image_encoder.backbone.layer3.0.bn1.weight": [
+   256
+  ],
+  "image_encoder.backbone.layer3.0.bn2.bias": [
+   256
+  ],
+  "image_encoder.backbone.layer3.0.bn2.num_batches_tracked": [],
+  "image_encoder.backbone.layer3.0.bn2.running_mean": [
+   256
+  ],
+  "image_encoder.backbone.layer3.0.bn2.running_var": [
+   256
+  ],
+  "image_encoder.backbone.layer3.0.bn2.weight": [
+   256
+  ],
+  "image_encoder.backbone.layer3.0.conv1.weight": [
+   256,
+   128,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer3.0.conv2.weight": [
+   256,
+   256,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer3.0.downsample.0.weight": [
+   256,
+   128,
+   1,
+   1
+  ],
+  "image_encoder.backbone.layer3.0.downsample.1.bias": [
+   256
+  ],
+  "image_encoder.backbone.layer3.0.downsample.1.num_batches_tracked": [],
+  "image_encoder.backbone.layer3.0.downsample.1.running_mean": [
+   256
+  ],
+  "image_encoder.backbone.layer3.0.downsample.1.running_var": [
+   256
+  ],
+  "image_encoder.backbone.layer3.0.downsample.1.weight": [
+   256
+  ],
+  "image_encoder.backbone.layer3.1.bn1.bias": [
+   256
+  ],
+  "image_encoder.backbone.layer3.1.bn1.num_batches_tracked": [],
+  "image_encoder.backbone.layer3.1.bn1.running_mean": [
+   256
+  ],
+  "image_encoder.backbone.layer3.1.bn1.running_var": [
+   256
+  ],
+  "image_encoder.backbone.layer3.1.bn1.weight": [
+   256
+  ],
+  "image_encoder.backbone.layer3.1.bn2.bias": [
+   256
+  ],
+  "image_encoder.backbone.layer3.1.bn2.num_batches_tracked": [],
+  "image_encoder.backbone.layer3.1.bn2.running_mean": [
+   256
+  ],
+  "image_encoder.backbone.layer3.1.bn2.running_var": [
+   256
+  ],
+  "image_encoder.backbone.layer3.1.bn2.weight": [
+   256
+  ],
+  "image_encoder.backbone.layer3.1.conv1.weight": [
+   256,
+   256,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer3.1.conv2.weight": [
+   256,
+   256,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer4.0.bn1.bias": [
+   512
+  ],
+  "image_encoder.backbone.layer4.0.bn1.num_batches_tracked": [],
+  "image_encoder.backbone.layer4.0.bn1.running_mean": [
+   512
+  ],
+  "image_encoder.backbone.layer4.0.bn1.running_var": [
+   512
+  ],
+  "image_encoder.backbone.layer4.0.bn1.weight": [
+   512
+  ],
+  "image_encoder.backbone.layer4.0.bn2.bias": [
+   512
+  ],
+  "image_encoder.backbone.layer4.0.bn2.num_batches_tracked": [],
+  "image_encoder.backbone.layer4.0.bn2.running_mean": [
+   512
+  ],
+  "image_encoder.backbone.layer4.0.bn2.running_var": [
+   512
+  ],
+  "image_encoder.backbone.layer4.0.bn2.weight": [
+   512
+  ],
+  "image_encoder.backbone.layer4.0.conv1.weight": [
+   512,
+   256,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer4.0.conv2.weight": [
+   512,
+   512,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer4.0.downsample.0.weight": [
+   512,
+   256,
+   1,
+   1
+  ],
+  "image_encoder.backbone.layer4.0.downsample.1.bias": [
+   512
+  ],
+  "image_encoder.backbone.layer4.0.downsample.1.num_batches_tracked": [],
+  "image_encoder.backbone.layer4.0.downsample.1.running_mean": [
+   512
+  ],
+  "image_encoder.backbone.layer4.0.downsample.1.running_var": [
+   512
+  ],
+  "image_encoder.backbone.layer4.0.downsample.1.weight": [
+   512
+  ],
+  "image_encoder.backbone.layer4.1.bn1.bias": [
+   512
+  ],
+  "image_encoder.backbone.layer4.1.bn1.num_batches_tracked": [],
+  "image_encoder.backbone.layer4.1.bn1.running_mean": [
+   512
+  ],
+  "image_encoder.backbone.layer4.1.bn1.running_var": [
+   512
+  ],
+  "image_encoder.backbone.layer4.1.bn1.weight": [
+   512
+  ],
+  "image_encoder.backbone.layer4.1.bn2.bias": [
+   512
+  ],
+  "image_encoder.backbone.layer4.1.bn2.num_batches_tracked": [],
+  "image_encoder.backbone.layer4.1.bn2.running_mean": [
+   512
+  ],
+  "image_encoder.backbone.layer4.1.bn2.running_var": [
+   512
+  ],
+  "image_encoder.backbone.layer4.1.bn2.weight": [
+   512
+  ],
+  "image_encoder.backbone.layer4.1.conv1.weight": [
+   512,
+   512,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer4.1.conv2.weight": [
+   512,
+   512,
+   3,
+   3
+  ],
+  "image_encoder.neck.depthwise.bias": [
+   32
+  ],
+  "image_encoder.neck.depthwise.weight": [
+   32,
+   32,
+   1,
+   1
+  ],
+  "image_encoder.neck.fpn_convs.bias": [
+   32
+  ],
+  "image_encoder.neck.fpn_convs.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "image_encoder.neck.lateral_convs.0.bias": [
+   32
+  ],
+  "image_encoder.neck.lateral_convs.0.weight": [
+   32,
+   128,
+   1,
+   1
+  ],
+  "image_encoder.neck.lateral_convs.1.bias": [
+   32
+  ],
+  "image_encoder.neck.lateral_convs.1.weight": [
+   32,
+   256,
+   1,
+   1
+  ],
+  "image_encoder.neck.lateral_convs.2.bias": [
+   32
+  ],
+  "image_encoder.neck.lateral_convs.2.weight": [
+   32,
+   512,
+   1,
+   1
+  ],
+  "init_bev_processing.0.bias": [
+   32
+  ],
+  "init_bev_processing.0.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "init_bev_processing.3.bias": [
+   32
+  ],
+  "init_bev_processing.3.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "init_bev_processing.6.bias": [
+   32
+  ],
+  "init_bev_processing.6.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "lifter.depth_network.bn.bias": [
+   16
+  ],
+  "lifter.depth_network.bn.num_batches_tracked": [],
+  "lifter.depth_network.bn.running_mean": [
+   16
+  ],
+  "lifter.depth_network.bn.running_var": [
+   16
+  ],
+  "lifter.depth_network.bn.weight": [
+   16
+  ],
+  "lifter.depth_network.context_conv.bias": [
+   32
+  ],
+  "lifter.depth_network.context_conv.weight": [
+   32,
+   32,
+   1,
+   1
+  ],
+  "lifter.depth_network.context_mlp.fc1.bias": [
+   32
+  ],
+  "lifter.depth_network.context_mlp.fc1.weight": [
+   32,
+   16
+  ],
+  "lifter.depth_network.context_mlp.fc2.bias": [
+   32
+  ],
+  "lifter.depth_network.context_mlp.fc2.weight": [
+   32,
+   32
+  ],
+  "lifter.depth_network.context_se.conv_expand.bias": [
+   32
+  ],
+  "lifter.depth_network.context_se.conv_expand.weight": [
+   32,
+   32,
+   1,
+   1
+  ],
+  "lifter.depth_network.context_se.conv_reduce.bias": [
+   32
+  ],
+  "lifter.depth_network.context_se.conv_reduce.weight": [
+   32,
+   32,
+   1,
+   1
+  ],
+  "lifter.depth_network.depth_conv.0.bn1.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.0.bn1.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.0.bn1.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.0.bn1.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.0.bn1.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.0.bn2.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.0.bn2.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.0.bn2.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.0.bn2.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.0.bn2.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.0.conv1.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.0.conv1.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "lifter.depth_network.depth_conv.0.conv2.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.0.conv2.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "lifter.depth_network.depth_conv.1.bn1.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.1.bn1.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.1.bn1.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.1.bn1.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.1.bn1.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.1.bn2.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.1.bn2.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.1.bn2.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.1.bn2.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.1.bn2.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.1.conv1.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.1.conv1.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "lifter.depth_network.depth_conv.1.conv2.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.1.conv2.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "lifter.depth_network.depth_conv.2.bn1.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.2.bn1.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.2.bn1.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.2.bn1.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.2.bn1.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.2.bn2.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.2.bn2.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.2.bn2.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.2.bn2.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.2.bn2.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.2.conv1.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.2.conv1.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "lifter.depth_network.depth_conv.2.conv2.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.2.conv2.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "lifter.depth_network.depth_conv.3.aspp1.atrous_conv.weight": [
+   32,
+   32,
+   1,
+   1
+  ],
+  "lifter.depth_network.depth_conv.3.aspp1.bn.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp1.bn.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.3.aspp1.bn.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp1.bn.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp1.bn.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp2.atrous_conv.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "lifter.depth_network.depth_conv.3.aspp2.bn.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp2.bn.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.3.aspp2.bn.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp2.bn.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp2.bn.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp3.atrous_conv.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "lifter.depth_network.depth_conv.3.aspp3.bn.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp3.bn.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.3.aspp3.bn.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp3.bn.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp3.bn.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp4.atrous_conv.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "lifter.depth_network.depth_conv.3.aspp4.bn.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp4.bn.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.3.aspp4.bn.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp4.bn.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp4.bn.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.bn1.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.bn1.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.3.bn1.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.bn1.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.bn1.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.conv1.weight": [
+   32,
+   160,
+   1,
+   1
+  ],
+  "lifter.depth_network.depth_conv.3.global_avg_pool.1.weight": [
+   32,
+   32,
+   1,
+   1
+  ],
+  "lifter.depth_network.depth_conv.3.global_avg_pool.2.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.global_avg_pool.2.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.3.global_avg_pool.2.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.global_avg_pool.2.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.global_avg_pool.2.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.4.bias": [
+   6
+  ],
+  "lifter.depth_network.depth_conv.4.weight": [
+   6,
+   32,
+   1,
+   1
+  ],
+  "lifter.depth_network.depth_mlp.fc1.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_mlp.fc1.weight": [
+   32,
+   16
+  ],
+  "lifter.depth_network.depth_mlp.fc2.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_mlp.fc2.weight": [
+   32,
+   32
+  ],
+  "lifter.depth_network.depth_se.conv_expand.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_se.conv_expand.weight": [
+   32,
+   32,
+   1,
+   1
+  ],
+  "lifter.depth_network.depth_se.conv_reduce.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_se.conv_reduce.weight": [
+   32,
+   32,
+   1,
+   1
+  ],
+  "lifter.depth_network.reduce_conv.0.bias": [
+   32
+  ],
+  "lifter.depth_network.reduce_conv.0.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "lifter.depth_network.reduce_conv.1.bias": [
+   32
+  ],
+  "lifter.depth_network.reduce_conv.1.num_batches_tracked": [],
+  "lifter.depth_network.reduce_conv.1.running_mean": [
+   32
+  ],
+  "lifter.depth_network.reduce_conv.1.running_var": [
+   32
+  ],
+  "lifter.depth_network.reduce_conv.1.weight": [
+   32
+  ],
+  "lifter.depths": [
+   6
+  ],
+  "lifter.initial_features": [
+   256,
+   32
+  ],
+  "lifter.point_cloud_lb": [
+   3
+  ],
+  "lifter.point_cloud_range": [
+   6
+  ],
+  "lifter.point_cloud_ub": [
+   3
+  ],
+  "lifter.points_mlp._linears.0.bias": [
+   32
+  ],
+  "lifter.points_mlp._linears.0.weight": [
+   32,
+   32
+  ],
+  "lifter.voxel_grid_size": [
+   2
+  ],
+  "lifter.voxel_size": [
+   2
+  ]
+ },
+ "cerveza_resnet18_simpleup_lss": {
+  "image_encoder.backbone.backbone.0.weight": [
+   64,
+   3,
+   7,
+   7
+  ],
+  "image_encoder.backbone.backbone.1.bias": [
+   64
+  ],
+  "image_encoder.backbone.backbone.1.num_batches_tracked": [],
+  "image_encoder.backbone.backbone.1.running_mean": [
+   64
+  ],
+  "image_encoder.backbone.backbone.1.running_var": [
+   64
+  ],
+  "image_encoder.backbone.backbone.1.weight": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.0.bn1.bias": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.0.bn1.num_batches_tracked": [],
+  "image_encoder.backbone.backbone.4.0.bn1.running_mean": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.0.bn1.running_var": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.0.bn1.weight": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.0.bn2.bias": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.0.bn2.num_batches_tracked": [],
+  "image_encoder.backbone.backbone.4.0.bn2.running_mean": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.0.bn2.running_var": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.0.bn2.weight": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.0.conv1.weight": [
+   64,
+   64,
+   3,
+   3
+  ],
+  "image_encoder.backbone.backbone.4.0.conv2.weight": [
+   64,
+   64,
+   3,
+   3
+  ],
+  "image_encoder.backbone.backbone.4.1.bn1.bias": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.1.bn1.num_batches_tracked": [],
+  "image_encoder.backbone.backbone.4.1.bn1.running_mean": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.1.bn1.running_var": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.1.bn1.weight": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.1.bn2.bias": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.1.bn2.num_batches_tracked": [],
+  "image_encoder.backbone.backbone.4.1.bn2.running_mean": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.1.bn2.running_var": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.1.bn2.weight": [
+   64
+  ],
+  "image_encoder.backbone.backbone.4.1.conv1.weight": [
+   64,
+   64,
+   3,
+   3
+  ],
+  "image_encoder.backbone.backbone.4.1.conv2.weight": [
+   64,
+   64,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer2.0.bn1.bias": [
+   128
+  ],
+  "image_encoder.backbone.layer2.0.bn1.num_batches_tracked": [],
+  "image_encoder.backbone.layer2.0.bn1.running_mean": [
+   128
+  ],
+  "image_encoder.backbone.layer2.0.bn1.running_var": [
+   128
+  ],
+  "image_encoder.backbone.layer2.0.bn1.weight": [
+   128
+  ],
+  "image_encoder.backbone.layer2.0.bn2.bias": [
+   128
+  ],
+  "image_encoder.backbone.layer2.0.bn2.num_batches_tracked": [],
+  "image_encoder.backbone.layer2.0.bn2.running_mean": [
+   128
+  ],
+  "image_encoder.backbone.layer2.0.bn2.running_var": [
+   128
+  ],
+  "image_encoder.backbone.layer2.0.bn2.weight": [
+   128
+  ],
+  "image_encoder.backbone.layer2.0.conv1.weight": [
+   128,
+   64,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer2.0.conv2.weight": [
+   128,
+   128,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer2.0.downsample.0.weight": [
+   128,
+   64,
+   1,
+   1
+  ],
+  "image_encoder.backbone.layer2.0.downsample.1.bias": [
+   128
+  ],
+  "image_encoder.backbone.layer2.0.downsample.1.num_batches_tracked": [],
+  "image_encoder.backbone.layer2.0.downsample.1.running_mean": [
+   128
+  ],
+  "image_encoder.backbone.layer2.0.downsample.1.running_var": [
+   128
+  ],
+  "image_encoder.backbone.layer2.0.downsample.1.weight": [
+   128
+  ],
+  "image_encoder.backbone.layer2.1.bn1.bias": [
+   128
+  ],
+  "image_encoder.backbone.layer2.1.bn1.num_batches_tracked": [],
+  "image_encoder.backbone.layer2.1.bn1.running_mean": [
+   128
+  ],
+  "image_encoder.backbone.layer2.1.bn1.running_var": [
+   128
+  ],
+  "image_encoder.backbone.layer2.1.bn1.weight": [
+   128
+  ],
+  "image_encoder.backbone.layer2.1.bn2.bias": [
+   128
+  ],
+  "image_encoder.backbone.layer2.1.bn2.num_batches_tracked": [],
+  "image_encoder.backbone.layer2.1.bn2.running_mean": [
+   128
+  ],
+  "image_encoder.backbone.layer2.1.bn2.running_var": [
+   128
+  ],
+  "image_encoder.backbone.layer2.1.bn2.weight": [
+   128
+  ],
+  "image_encoder.backbone.layer2.1.conv1.weight": [
+   128,
+   128,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer2.1.conv2.weight": [
+   128,
+   128,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer3.0.bn1.bias": [
+   256
+  ],
+  "image_encoder.backbone.layer3.0.bn1.num_batches_tracked": [],
+  "image_encoder.backbone.layer3.0.bn1.running_mean": [
+   256
+  ],
+  "image_encoder.backbone.layer3.0.bn1.running_var": [
+   256
+  ],
+  "image_encoder.backbone.layer3.0.bn1.weight": [
+   256
+  ],
+  "image_encoder.backbone.layer3.0.bn2.bias": [
+   256
+  ],
+  "image_encoder.backbone.layer3.0.bn2.num_batches_tracked": [],
+  "image_encoder.backbone.layer3.0.bn2.running_mean": [
+   256
+  ],
+  "image_encoder.backbone.layer3.0.bn2.running_var": [
+   256
+  ],
+  "image_encoder.backbone.layer3.0.bn2.weight": [
+   256
+  ],
+  "image_encoder.backbone.layer3.0.conv1.weight": [
+   256,
+   128,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer3.0.conv2.weight": [
+   256,
+   256,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer3.0.downsample.0.weight": [
+   256,
+   128,
+   1,
+   1
+  ],
+  "image_encoder.backbone.layer3.0.downsample.1.bias": [
+   256
+  ],
+  "image_encoder.backbone.layer3.0.downsample.1.num_batches_tracked": [],
+  "image_encoder.backbone.layer3.0.downsample.1.running_mean": [
+   256
+  ],
+  "image_encoder.backbone.layer3.0.downsample.1.running_var": [
+   256
+  ],
+  "image_encoder.backbone.layer3.0.downsample.1.weight": [
+   256
+  ],
+  "image_encoder.backbone.layer3.1.bn1.bias": [
+   256
+  ],
+  "image_encoder.backbone.layer3.1.bn1.num_batches_tracked": [],
+  "image_encoder.backbone.layer3.1.bn1.running_mean": [
+   256
+  ],
+  "image_encoder.backbone.layer3.1.bn1.running_var": [
+   256
+  ],
+  "image_encoder.backbone.layer3.1.bn1.weight": [
+   256
+  ],
+  "image_encoder.backbone.layer3.1.bn2.bias": [
+   256
+  ],
+  "image_encoder.backbone.layer3.1.bn2.num_batches_tracked": [],
+  "image_encoder.backbone.layer3.1.bn2.running_mean": [
+   256
+  ],
+  "image_encoder.backbone.layer3.1.bn2.running_var": [
+   256
+  ],
+  "image_encoder.backbone.layer3.1.bn2.weight": [
+   256
+  ],
+  "image_encoder.backbone.layer3.1.conv1.weight": [
+   256,
+   256,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer3.1.conv2.weight": [
+   256,
+   256,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer4.0.bn1.bias": [
+   512
+  ],
+  "image_encoder.backbone.layer4.0.bn1.num_batches_tracked": [],
+  "image_encoder.backbone.layer4.0.bn1.running_mean": [
+   512
+  ],
+  "image_encoder.backbone.layer4.0.bn1.running_var": [
+   512
+  ],
+  "image_encoder.backbone.layer4.0.bn1.weight": [
+   512
+  ],
+  "image_encoder.backbone.layer4.0.bn2.bias": [
+   512
+  ],
+  "image_encoder.backbone.layer4.0.bn2.num_batches_tracked": [],
+  "image_encoder.backbone.layer4.0.bn2.running_mean": [
+   512
+  ],
+  "image_encoder.backbone.layer4.0.bn2.running_var": [
+   512
+  ],
+  "image_encoder.backbone.layer4.0.bn2.weight": [
+   512
+  ],
+  "image_encoder.backbone.layer4.0.conv1.weight": [
+   512,
+   256,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer4.0.conv2.weight": [
+   512,
+   512,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer4.0.downsample.0.weight": [
+   512,
+   256,
+   1,
+   1
+  ],
+  "image_encoder.backbone.layer4.0.downsample.1.bias": [
+   512
+  ],
+  "image_encoder.backbone.layer4.0.downsample.1.num_batches_tracked": [],
+  "image_encoder.backbone.layer4.0.downsample.1.running_mean": [
+   512
+  ],
+  "image_encoder.backbone.layer4.0.downsample.1.running_var": [
+   512
+  ],
+  "image_encoder.backbone.layer4.0.downsample.1.weight": [
+   512
+  ],
+  "image_encoder.backbone.layer4.1.bn1.bias": [
+   512
+  ],
+  "image_encoder.backbone.layer4.1.bn1.num_batches_tracked": [],
+  "image_encoder.backbone.layer4.1.bn1.running_mean": [
+   512
+  ],
+  "image_encoder.backbone.layer4.1.bn1.running_var": [
+   512
+  ],
+  "image_encoder.backbone.layer4.1.bn1.weight": [
+   512
+  ],
+  "image_encoder.backbone.layer4.1.bn2.bias": [
+   512
+  ],
+  "image_encoder.backbone.layer4.1.bn2.num_batches_tracked": [],
+  "image_encoder.backbone.layer4.1.bn2.running_mean": [
+   512
+  ],
+  "image_encoder.backbone.layer4.1.bn2.running_var": [
+   512
+  ],
+  "image_encoder.backbone.layer4.1.bn2.weight": [
+   512
+  ],
+  "image_encoder.backbone.layer4.1.conv1.weight": [
+   512,
+   512,
+   3,
+   3
+  ],
+  "image_encoder.backbone.layer4.1.conv2.weight": [
+   512,
+   512,
+   3,
+   3
+  ],
+  "image_encoder.neck.depthwise.bias": [
+   32
+  ],
+  "image_encoder.neck.depthwise.weight": [
+   32,
+   32,
+   1,
+   1
+  ],
+  "image_encoder.neck.reduce_dims.0.0.weight": [
+   32,
+   128,
+   1,
+   1
+  ],
+  "image_encoder.neck.reduce_dims.1.0.weight": [
+   32,
+   256,
+   1,
+   1
+  ],
+  "image_encoder.neck.reduce_dims.2.0.weight": [
+   32,
+   512,
+   1,
+   1
+  ],
+  "image_encoder.neck.upsample.conv.0.weight": [
+   32,
+   64,
+   3,
+   3
+  ],
+  "image_encoder.neck.upsample.conv.3.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "init_bev_processing.0.bias": [
+   32
+  ],
+  "init_bev_processing.0.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "init_bev_processing.3.bias": [
+   32
+  ],
+  "init_bev_processing.3.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "init_bev_processing.6.bias": [
+   32
+  ],
+  "init_bev_processing.6.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "lifter.depth_network.bn.bias": [
+   16
+  ],
+  "lifter.depth_network.bn.num_batches_tracked": [],
+  "lifter.depth_network.bn.running_mean": [
+   16
+  ],
+  "lifter.depth_network.bn.running_var": [
+   16
+  ],
+  "lifter.depth_network.bn.weight": [
+   16
+  ],
+  "lifter.depth_network.context_conv.bias": [
+   32
+  ],
+  "lifter.depth_network.context_conv.weight": [
+   32,
+   32,
+   1,
+   1
+  ],
+  "lifter.depth_network.context_mlp.fc1.bias": [
+   32
+  ],
+  "lifter.depth_network.context_mlp.fc1.weight": [
+   32,
+   16
+  ],
+  "lifter.depth_network.context_mlp.fc2.bias": [
+   32
+  ],
+  "lifter.depth_network.context_mlp.fc2.weight": [
+   32,
+   32
+  ],
+  "lifter.depth_network.context_se.conv_expand.bias": [
+   32
+  ],
+  "lifter.depth_network.context_se.conv_expand.weight": [
+   32,
+   32,
+   1,
+   1
+  ],
+  "lifter.depth_network.context_se.conv_reduce.bias": [
+   32
+  ],
+  "lifter.depth_network.context_se.conv_reduce.weight": [
+   32,
+   32,
+   1,
+   1
+  ],
+  "lifter.depth_network.depth_conv.0.bn1.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.0.bn1.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.0.bn1.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.0.bn1.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.0.bn1.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.0.bn2.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.0.bn2.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.0.bn2.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.0.bn2.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.0.bn2.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.0.conv1.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.0.conv1.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "lifter.depth_network.depth_conv.0.conv2.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.0.conv2.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "lifter.depth_network.depth_conv.1.bn1.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.1.bn1.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.1.bn1.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.1.bn1.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.1.bn1.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.1.bn2.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.1.bn2.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.1.bn2.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.1.bn2.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.1.bn2.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.1.conv1.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.1.conv1.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "lifter.depth_network.depth_conv.1.conv2.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.1.conv2.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "lifter.depth_network.depth_conv.2.bn1.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.2.bn1.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.2.bn1.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.2.bn1.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.2.bn1.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.2.bn2.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.2.bn2.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.2.bn2.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.2.bn2.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.2.bn2.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.2.conv1.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.2.conv1.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "lifter.depth_network.depth_conv.2.conv2.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.2.conv2.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "lifter.depth_network.depth_conv.3.aspp1.atrous_conv.weight": [
+   32,
+   32,
+   1,
+   1
+  ],
+  "lifter.depth_network.depth_conv.3.aspp1.bn.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp1.bn.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.3.aspp1.bn.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp1.bn.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp1.bn.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp2.atrous_conv.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "lifter.depth_network.depth_conv.3.aspp2.bn.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp2.bn.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.3.aspp2.bn.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp2.bn.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp2.bn.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp3.atrous_conv.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "lifter.depth_network.depth_conv.3.aspp3.bn.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp3.bn.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.3.aspp3.bn.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp3.bn.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp3.bn.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp4.atrous_conv.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "lifter.depth_network.depth_conv.3.aspp4.bn.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp4.bn.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.3.aspp4.bn.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp4.bn.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.aspp4.bn.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.bn1.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.bn1.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.3.bn1.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.bn1.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.bn1.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.conv1.weight": [
+   32,
+   160,
+   1,
+   1
+  ],
+  "lifter.depth_network.depth_conv.3.global_avg_pool.1.weight": [
+   32,
+   32,
+   1,
+   1
+  ],
+  "lifter.depth_network.depth_conv.3.global_avg_pool.2.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.global_avg_pool.2.num_batches_tracked": [],
+  "lifter.depth_network.depth_conv.3.global_avg_pool.2.running_mean": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.global_avg_pool.2.running_var": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.3.global_avg_pool.2.weight": [
+   32
+  ],
+  "lifter.depth_network.depth_conv.4.bias": [
+   6
+  ],
+  "lifter.depth_network.depth_conv.4.weight": [
+   6,
+   32,
+   1,
+   1
+  ],
+  "lifter.depth_network.depth_mlp.fc1.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_mlp.fc1.weight": [
+   32,
+   16
+  ],
+  "lifter.depth_network.depth_mlp.fc2.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_mlp.fc2.weight": [
+   32,
+   32
+  ],
+  "lifter.depth_network.depth_se.conv_expand.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_se.conv_expand.weight": [
+   32,
+   32,
+   1,
+   1
+  ],
+  "lifter.depth_network.depth_se.conv_reduce.bias": [
+   32
+  ],
+  "lifter.depth_network.depth_se.conv_reduce.weight": [
+   32,
+   32,
+   1,
+   1
+  ],
+  "lifter.depth_network.reduce_conv.0.bias": [
+   32
+  ],
+  "lifter.depth_network.reduce_conv.0.weight": [
+   32,
+   32,
+   3,
+   3
+  ],
+  "lifter.depth_network.reduce_conv.1.bias": [
+   32
+  ],
+  "lifter.depth_network.reduce_conv.1.num_batches_tracked": [],
+  "lifter.depth_network.reduce_conv.1.running_mean": [
+   32
+  ],
+  "lifter.depth_network.reduce_conv.1.running_var": [
+   32
+  ],
+  "lifter.depth_network.reduce_conv.1.weight": [
+   32
+  ],
+  "lifter.depths": [
+   6
+  ],
+  "lifter.initial_features": [
+   256,
+   32
+  ],
+  "lifter.point_cloud_lb": [
+   3
+  ],
+  "lifter.point_cloud_range": [
+   6
+  ],
+  "lifter.point_cloud_ub": [
+   3
+  ],
+  "lifter.points_mlp._linears.0.bias": [
+   32
+  ],
+  "lifter.points_mlp._linears.0.weight": [
+   32,
+   32
+  ],
+  "lifter.voxel_grid_size": [
+   2
+  ],
+  "lifter.voxel_size": [
+   2
+  ]
+ }
+}

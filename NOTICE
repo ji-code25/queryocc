@@ -1,0 +1,53 @@
+QueryOcc
+Copyright 2026 The QueryOcc Authors
+
+This product includes software developed by third parties, listed below and in
+THIRD_PARTY.md. Each retains its own copyright and license; the terms of those
+licenses apply to those portions rather than the Apache License, Version 2.0
+that covers the rest of this work.
+
+--------------------------------------------------------------------------------
+Deformable attention operators
+  queryocc/model/ops/functions/
+  Copyright (c) 2020 SenseTime. All Rights Reserved.
+  Licensed under the Apache License, Version 2.0.
+  https://github.com/fundamentalvision/Deformable-DETR
+
+--------------------------------------------------------------------------------
+Pose and rotation utilities
+  queryocc/utils/geometry/poses.py
+  queryocc/utils/geometry/rotations.py
+  Copyright 2024 the authors of NeuRAD and contributors.
+  Copyright 2022 the Regents of the University of California, Nerfstudio Team
+  and contributors. All rights reserved.
+  Licensed under the Apache License, Version 2.0.
+  https://github.com/georghess/neurad-studio
+  https://github.com/nerfstudio-project/nerfstudio
+
+--------------------------------------------------------------------------------
+ConvNeXt backbone
+  queryocc/model/components/image_encoders/backbones/convnext.py
+  Copyright (c) Meta Platforms, Inc. and affiliates.
+  Licensed under the MIT License.
+  https://github.com/facebookresearch/ConvNeXt
+
+--------------------------------------------------------------------------------
+Differentiable volume rendering (dvr) CUDA operator
+  queryocc/model/ops/dvr/
+  Copyright (c) 2024 Tarasha Khurana
+  Licensed under the MIT License.
+  https://github.com/tarashakhurana/4d-occ-forecasting
+
+--------------------------------------------------------------------------------
+Dynamic convolution
+  queryocc/model/components/dynamic_conv.py
+  Copyright (c) 2021 xmu-xiaoma666
+  Licensed under the MIT License.
+  https://github.com/xmu-xiaoma666/External-Attention-pytorch
+
+--------------------------------------------------------------------------------
+Cautious AdamW optimizer
+  queryocc/optimizer/cAdam.py
+  Copyright (c) 2024 Kaizhao Liang
+  Licensed under the MIT License.
+  https://github.com/kyleliang919/C-Optim

@@ -1,0 +1,4 @@
+name="queryocc"                     model="queryocc-nusc"          extra="--allow_visualization --visualizer.f_viz_occ_3d_bev --visualizer.f_viz_bev_features"
+name="queryocc-lidar"               model="queryocc-lidar-nusc"    extra="--allow_visualization --visualizer.f_viz_occ_3d_bev --visualizer.f_viz_bev_features"
+name="queryocc-pseudo-and-lidar"    model="queryocc-joint-nusc"    extra="--allow_visualization --visualizer.f_viz_occ_3d_bev --visualizer.f_viz_bev_features"
+name="queryocc-lidar-add-av2"       model="queryocc-nusc-av2"      extra="--allow_visualization --visualizer.f_viz_occ_3d_bev --visualizer.f_viz_bev_features"
