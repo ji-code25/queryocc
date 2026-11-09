@@ -122,6 +122,7 @@ celerybeat.pid
 # Environments
 .env
 .envrc
+scripts/env.local.sh
 .venv
 env/
 venv/

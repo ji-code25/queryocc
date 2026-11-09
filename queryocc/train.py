@@ -35,7 +35,8 @@ from lightning.pytorch.loggers import WandbLogger
 from lightning.pytorch.profilers import AdvancedProfiler, PyTorchProfiler
 from lightning.pytorch.strategies import DDPStrategy
 
-from queryocc.callbacks.checkpoint import WeightsOnlyCheckpoint
+from queryocc.callbacks.checkpoint import FinalStepModelCheckpoint, WeightsOnlyCheckpoint
+from queryocc.callbacks.sampler import ValidationSamplerEpochSetter
 from queryocc.config.method_configs import AnnotatedBaseConfigUnion, convert_markup_to_ansi
 from queryocc.config.trainer import TrainingConfig
 from queryocc.data.joint_datamodule import JointDataModule
@@ -303,8 +304,14 @@ def main(config: TrainingConfig):
     wandb_logger = get_wandb_logger(config, model.__class__.__name__)
 
     callbacks = [
-        cb.ModelCheckpoint(monitor=config.monitor_key, save_top_k=1, mode=config.monitor_mode, save_last=True),
+        FinalStepModelCheckpoint(
+            monitor=config.monitor_key,
+            save_top_k=1,
+            mode=config.monitor_mode,
+            save_last=True,
+        ),
         cb.LearningRateMonitor(logging_interval="step"),
+        ValidationSamplerEpochSetter(),
     ]
 
     if config.save_weights_only:

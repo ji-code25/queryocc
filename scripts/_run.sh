@@ -9,7 +9,9 @@
 name=${1:?"No name given"}
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-[ -f "$SCRIPT_DIR/env.local.sh" ] && source "$SCRIPT_DIR/env.local.sh"
+if [ -z "${QUERYOCC_SKIP_ENV_LOCAL:-}" ] && [ -f "$SCRIPT_DIR/env.local.sh" ]; then
+    source "$SCRIPT_DIR/env.local.sh"
+fi
 
 # W&B: leave WANDB_ENTITY unset to log to your own default entity (your personal
 # account, resolved from ~/.netrc). Set it in scripts/env.local.sh only to log into a
@@ -33,6 +35,11 @@ NUSC_LIDARSEG=${NUSC_LIDARSEG:-"$NUSC_DATASET_ROOT/lidarseg"}
 NUSC_OCC3D_DATASET_ROOT=${NUSC_OCC3D_DATASET_ROOT:-"$PROJECT_ROOT/occ3d-nuscenes"}
 NUSC_INFOS_ROOT=${NUSC_INFOS_ROOT:-"$PROJECT_ROOT/infos"}
 PSEUDO_LABEL_ROOT=${PSEUDO_LABEL_ROOT:-"$PROJECT_ROOT/pseudo_labels/bevdetv2-nuscenes"}
+# The two streams may be produced/stored independently. PSEUDO_LABEL_ROOT remains
+# the backwards-compatible common parent, while these two variables let a site
+# bind the exact Grounded-SAM and Metric3D directories it already has.
+PSEUDO_SEMANTICS_ROOT=${PSEUDO_SEMANTICS_ROOT:-"$PSEUDO_LABEL_ROOT/semantics"}
+PSEUDO_DEPTH_ROOT=${PSEUDO_DEPTH_ROOT:-"$PSEUDO_LABEL_ROOT/depth"}
 NUSC_MISSING_POINTS_DIR=${NUSC_MISSING_POINTS_DIR:-"$PROJECT_ROOT/nuscenes_missing_points_cache"}
 AV2_DATASET_ROOT=${AV2_DATASET_ROOT:-"$PROJECT_ROOT/av2"}
 AV2_MISSING_POINTS_DIR=${AV2_MISSING_POINTS_DIR:-"$PROJECT_ROOT/av2_missing_points_cache"}
@@ -83,12 +90,13 @@ apptainer exec --nv \
     --bind $NUSC_DATASET_ROOT/v1.0-mini/:/datasets/nuscenes/v1.0-mini \
     --bind $NUSC_DATASET_ROOT/v1.0-test/:/datasets/nuscenes/v1.0-test \
     --bind $NUSC_DATASET_ROOT/v1.0-trainval/:/datasets/nuscenes/v1.0-trainval \
+    --bind $NUSC_DATASET_ROOT/maps/:/datasets/nuscenes/maps \
     --bind $NUSC_PANOPTIC:/datasets/nuscenes/panoptic \
     --bind $NUSC_LIDARSEG:/datasets/nuscenes/lidarseg \
     --bind $NUSC_OCC3D_DATASET_ROOT:/datasets/occ3d-nuscenes/ \
     --bind $NUSC_INFOS_ROOT:/datasets/nuscenes/infos/ \
-    --bind $PSEUDO_LABEL_ROOT/semantics:/datasets/pseudo_labels/semantics \
-    --bind $PSEUDO_LABEL_ROOT/depth:/datasets/pseudo_labels/depth \
+    --bind $PSEUDO_SEMANTICS_ROOT:/datasets/pseudo_labels/semantics \
+    --bind $PSEUDO_DEPTH_ROOT:/datasets/pseudo_labels/depth \
     --bind $NUSC_MISSING_POINTS_DIR:/datasets/nuscenes_missing_points \
     --bind $AV2_DATASET_ROOT:/datasets/argoverse2/ \
     --bind $AV2_MISSING_POINTS_DIR:/datasets/av2_missing_points \

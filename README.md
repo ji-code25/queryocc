@@ -215,6 +215,57 @@ sbatch scripts/train_multi_gpu.sh <run-name> queryocc-nusc
 sbatch --array=1-4 scripts/arrays/array_train.sh release   # the full release matrix
 ```
 
+### Berzelius smoke training
+
+Before a full `queryocc-nusc` run, the smoke workflow exercises the production model and
+the real Grounded-SAM + Metric3D input path with a bounded, reproducible workload:
+
+- 100 deterministic training records, repeated to a 200-sample budget on 2 GPUs with
+  batch size 1/GPU and no accumulation;
+- QueryOcc's normal sample-budget scaling turns `max_steps=200` into exactly 100
+  optimizer steps while the datamodule repeats the small frozen subset;
+- 32 frozen validation records, selected to cover every dynamic Occ3D class and
+  yielding 28 valid temporal anchors after scene-boundary filtering;
+- the production ConvNeXt/DINOv3 backbone, compile path and 200k-query budget (none are
+  reduced for the smoke run);
+- preflight validation of every selected semantics/depth archive, followed by a
+  `last.ckpt` check whose `global_step` must be exactly 100;
+- final evaluation of both the validation-best and final checkpoints on all 28
+  valid smoke anchors, mirroring the full-run best/final protocol.
+
+Copy `scripts/env.local.example` to the git-ignored `scripts/env.local.sh` and fill in
+the Berzelius paths. Grounded-SAM and Metric3D can be stored separately via
+`PSEUDO_SEMANTICS_ROOT` and `PSEUDO_DEPTH_ROOT`; the launcher binds them into QueryOcc's
+fixed container layout. The existing DragonBall/GaussianFlowOcc format is also supported:
+set `LEGACY_PSEUDO_SEMANTICS_ROOT` and `LEGACY_PSEUDO_DEPTH_ROOT` instead. Preparation
+packs the six per-camera masks into one file, fixes the legacy sky-label collision
+(`17 -> 18`), reorders Metric3D to the embedded `cam_order`, and only exposes complete
+label/depth records to QueryOcc. Then submit preparation and training as one dependency chain:
+
+```bash
+scripts/submit_queryocc_smoke_berzelius.sh
+```
+
+Set `QUERYOCC_CONVERTED_ROOT` to the canonical materialized dataset location. Smoke
+preparation writes its first complete records there, and full training reuses them. Once
+all 28,130 training records have refined six-camera labels/scores, run the resumable
+one-time full conversion on the CPU partition:
+
+```bash
+sbatch scripts/convert_queryocc_pseudo_labels_berzelius.sh
+```
+
+The full job gates on all expected records before writing, skips already converted
+samples, and atomically renames each output pair, so it is safe to resubmit after a
+timeout without duplicating data.
+
+The preparation job writes frozen info files plus `manifest.json` under
+`$QUERYOCC_SMOKE_ROOT/smoke_inputs`. The GPU job writes
+`$OUTPUT_DIR/smoke_runs/queryocc-nusc-smoke100-<job-id>/smoke_summary.json` only after
+the input preflight, 100 training steps, validation and checkpoint checks all pass. The
+GPU request has no `fat`/80 GB constraint: the production camera-only preset is expected
+to fit an ordinary 40 GB Berzelius A100.
+
 ### Release matrix
 
 | Preset | Supervision | Datasets |

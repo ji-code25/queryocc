@@ -71,6 +71,9 @@ class JointDataModuleConfig(cfg.InstantiateConfig):
     """The prefetch factor."""
     shuffle_test: bool = False
     """Whether to shuffle the test dataloader."""
+    shuffle_val: bool = False
+    """Shuffle validation deterministically by training epoch. With a fractional or fixed
+    ``limit_val_batches``, this draws a new reproducible subset at each validation event."""
     balanced_dataset_sampling: bool = False
     """Whether to balance the dataset sampling."""
     num_samples_per_rank: Optional[int] = None
@@ -349,13 +352,13 @@ class JointDataModule(LightningDataModule):
         """
         assert self.data_val is not None, "Data not loaded. Run `setup()` first."
         if is_ddp_active():
-            sampler_val = DistributedSampler(self.data_val, shuffle=False, drop_last=False)
+            sampler_val = DistributedSampler(self.data_val, shuffle=self.config.shuffle_val, drop_last=False)
         else:
             sampler_val = None
 
         return DataLoader(
             dataset=self.data_val,
-            shuffle=False,
+            shuffle=self.config.shuffle_val if sampler_val is None else False,
             sampler=sampler_val,
             # Non-persistent + few workers: a leftover val pool (reaping is unreliable) must stay
             # small so it can't oversubscribe the cores alongside the train pool (see _dataloader_kwargs).

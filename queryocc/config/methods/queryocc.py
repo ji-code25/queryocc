@@ -26,7 +26,11 @@ queryocc_nusc = register(
         scale_lr_with_batch_size=True,
         trainer=TrainerConfig(
             max_steps=300_000,
-            val_check_interval=0.5,
+            # Periodic validation is intentionally sparse: the 300 batches/rank are
+            # expensive, while best/final checkpoints receive a full validation after
+            # training.  Run once at the end of every sixth epoch.
+            val_check_interval=1.0,
+            check_val_every_n_epoch=6,
             sync_batchnorm=True,
             limit_val_batches=300,
             precision="bf16-mixed",
@@ -93,6 +97,10 @@ queryocc_nusc = register(
             datasets_to_include=("nuscenes",),
             batch_size=3,
             val_batch_size=1,
+            # limit_val_batches=300/rank on four GPUs samples roughly 20% of the
+            # 6,019-frame validation split. The sampler callback changes the
+            # deterministic random subset at each six-epoch validation event.
+            shuffle_val=True,
             splits="original",
             dataset=ZODBaseDatasetConfig(
                 make_batchable=True,
