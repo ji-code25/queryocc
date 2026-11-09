@@ -25,19 +25,26 @@ queryocc_nusc = register(
     TrainingConfig(
         scale_lr_with_batch_size=True,
         trainer=TrainerConfig(
-            max_steps=300_000,
-            # Periodic validation is intentionally sparse: the 300 batches/rank are
-            # expensive, while best/final checkpoints receive a full validation after
-            # training.  Run once at the end of every sixth epoch.
+            # Run exactly 12 complete epochs. A sample-budget max_steps value can stop
+            # slightly before an epoch boundary after DistributedSampler padding and
+            # gradient accumulation, so epoch-limited training is intentional here.
+            max_steps=-1,
+            max_epochs=12,
+            # Validation runs only at the explicitly scheduled epochs below. Each event
+            # uses 300 batches/rank, while best/final checkpoints receive a full
+            # validation after training.
             val_check_interval=1.0,
-            check_val_every_n_epoch=6,
+            check_val_every_n_epoch=1,
             sync_batchnorm=True,
             limit_val_batches=300,
+            num_sanity_val_steps=0,
             precision="bf16-mixed",
         ),
+        validation_epochs=(6, 7, 8, 9, 10, 11),
         monitor_key="val/occ3d/metrics/occ3d_binary_rayiou/max_binary_rayiou",
         monitor_mode="max",
         test_after_fit_ckpt_path="best",
+        test_best_and_last_after_fit=True,
         model=PreTrainConfig(
             # Tuned up from the paper's 5e-5: 7.5e-5 sits at the top of a clean
             # inverted-U in the LR sweep (5e-5 -> 23.32, 7.5e-5 -> 24.13 mean of 3 seeds,
@@ -99,7 +106,7 @@ queryocc_nusc = register(
             val_batch_size=1,
             # limit_val_batches=300/rank on four GPUs samples roughly 20% of the
             # 6,019-frame validation split. The sampler callback changes the
-            # deterministic random subset at each six-epoch validation event.
+            # deterministic random subset at each scheduled validation epoch.
             shuffle_val=True,
             splits="original",
             dataset=ZODBaseDatasetConfig(

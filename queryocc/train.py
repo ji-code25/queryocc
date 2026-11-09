@@ -36,7 +36,7 @@ from lightning.pytorch.profilers import AdvancedProfiler, PyTorchProfiler
 from lightning.pytorch.strategies import DDPStrategy
 
 from queryocc.callbacks.checkpoint import FinalStepModelCheckpoint, WeightsOnlyCheckpoint
-from queryocc.callbacks.sampler import ValidationSamplerEpochSetter
+from queryocc.callbacks.sampler import ValidationEpochScheduler, ValidationSamplerEpochSetter
 from queryocc.config.method_configs import AnnotatedBaseConfigUnion, convert_markup_to_ansi
 from queryocc.config.trainer import TrainingConfig
 from queryocc.data.joint_datamodule import JointDataModule
@@ -140,7 +140,13 @@ def scale_with_num_gpus(config: TrainingConfig) -> None:
         rsetattr(config, key, rgetattr(config, key) * num_gpus * num_nodes)
 
     for key in keys_to_divide:
-        rsetattr(config, key, rgetattr(config, key) / num_gpus / num_nodes / num_acc / per_device_batch_size)
+        value = rgetattr(config, key)
+        # Lightning uses a negative max_steps value to disable the step limit in
+        # epoch-limited runs. Preserve that sentinel instead of scaling it into a
+        # negative float.
+        if key == "trainer.max_steps" and value < 0:
+            continue
+        rsetattr(config, key, value / num_gpus / num_nodes / num_acc / per_device_batch_size)
 
     if "model.max_lr" in keys_to_scale:
         # With scale_lr_with_batch_size, the LR scales linearly with the total effective batch
@@ -314,6 +320,9 @@ def main(config: TrainingConfig):
         ValidationSamplerEpochSetter(),
     ]
 
+    if config.validation_epochs:
+        callbacks.append(ValidationEpochScheduler(config.validation_epochs, config.trainer.limit_val_batches))
+
     if config.save_weights_only:
         callbacks.append(
             WeightsOnlyCheckpoint(
@@ -449,7 +458,12 @@ def main(config: TrainingConfig):
             )
 
         if config.test:
-            trainer.test(model, datamodule=dm, ckpt_path=config.test_after_fit_ckpt_path, weights_only=False)
+            checkpoint_paths = (
+                ("best", "last") if config.test_best_and_last_after_fit else (config.test_after_fit_ckpt_path,)
+            )
+            for checkpoint_path in checkpoint_paths:
+                logger.info("Running complete post-fit evaluation from the %s checkpoint", checkpoint_path)
+                trainer.test(model, datamodule=dm, ckpt_path=checkpoint_path, weights_only=False)
 
     if config.test and not config.train:
         trainer.test(model=model, datamodule=dm)

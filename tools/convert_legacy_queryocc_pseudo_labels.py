@@ -19,6 +19,8 @@ from __future__ import annotations
 import argparse
 import json
 import pickle
+from concurrent.futures import ProcessPoolExecutor
+from functools import partial
 from pathlib import Path
 from typing import Any
 
@@ -231,6 +233,9 @@ def convert_record(
 
 
 def convert(args: argparse.Namespace) -> dict[str, Any]:
+    workers = getattr(args, "workers", 1)
+    if workers < 1:
+        raise ValueError(f"workers must be at least 1, got {workers}")
     depth_layout = resolve_depth_layout(args.depth_root, getattr(args, "depth_layout", "auto"))
     records = []
     seen: set[str] = set()
@@ -276,17 +281,35 @@ def convert(args: argparse.Namespace) -> dict[str, Any]:
 
     converted = 0
     if not args.dry_run:
-        for record in complete:
-            convert_record(
-                record,
-                args.semantics_root,
-                args.depth_root,
-                args.output_root,
-                args.require_scores,
-                args.overwrite,
-                depth_layout,
-            )
-            converted += 1
+        convert_one = partial(
+            convert_record,
+            semantics_root=args.semantics_root,
+            depth_root=args.depth_root,
+            output_root=args.output_root,
+            require_scores=args.require_scores,
+            overwrite=args.overwrite,
+            depth_layout=depth_layout,
+        )
+        if workers == 1:
+            results = map(convert_one, complete)
+            executor = None
+        else:
+            executor = ProcessPoolExecutor(max_workers=workers)
+            results = executor.map(convert_one, complete, chunksize=1)
+
+        progress_interval = max(1, min(500, len(complete) // 20))
+        try:
+            for _ in results:
+                converted += 1
+                if converted % progress_interval == 0 or converted == len(complete):
+                    print(
+                        f"Converted {converted}/{len(complete)} records "
+                        f"with {workers} worker(s)",
+                        flush=True,
+                    )
+        finally:
+            if executor is not None:
+                executor.shutdown(wait=True, cancel_futures=True)
 
     summary = {
         "schema_version": 1,
@@ -298,6 +321,7 @@ def convert(args: argparse.Namespace) -> dict[str, Any]:
         "complete_records": available_complete_records,
         "selected_records": len(complete),
         "converted_records": converted,
+        "conversion_workers": workers,
         "dry_run": args.dry_run,
         "camera_order": list(CAMERA_ORDER),
         "legacy_depth_order": list(
@@ -325,6 +349,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--max-samples", type=int)
     parser.add_argument("--min-complete", type=int)
+    parser.add_argument("--workers", type=int, default=1)
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
 

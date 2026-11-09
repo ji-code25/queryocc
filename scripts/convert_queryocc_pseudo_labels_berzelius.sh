@@ -2,9 +2,9 @@
 #
 #SBATCH --nodes=1
 #SBATCH --partition=berzelius-cpu
-#SBATCH --cpus-per-task=4
-#SBATCH --mem=32G
-#SBATCH --time=24:00:00
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=64G
+#SBATCH --time=06:00:00
 #SBATCH --output=/proj/agp/users/%u/logs/%j.out
 #SBATCH --account=berzelius-2026-289
 #SBATCH --job-name=queryocc_convert
@@ -34,6 +34,12 @@ cd "$REPO_ROOT"
 CONTAINER=${CONTAINER:-"$PROJECT_ROOT/containers/queryocc.sif"}
 NUSC_INFOS_ROOT=${NUSC_INFOS_ROOT:-"$PROJECT_ROOT/infos"}
 FULL_CONVERSION_EXPECTED_TRAIN=${FULL_CONVERSION_EXPECTED_TRAIN:-28130}
+CONVERSION_WORKERS=${CONVERSION_WORKERS:-${SLURM_CPUS_PER_TASK:-16}}
+
+if (( CONVERSION_WORKERS < 1 )); then
+    echo "CONVERSION_WORKERS must be at least 1, got $CONVERSION_WORKERS" >&2
+    exit 2
+fi
 
 for required_path in \
     "$CONTAINER" \
@@ -58,6 +64,10 @@ apptainer exec \
     --bind "$LEGACY_PSEUDO_DEPTH_ROOT":/legacy_depth:ro \
     --bind "$QUERYOCC_CONVERTED_ROOT":/converted \
     --env PYTHONPATH=/queryocc \
+    --env OMP_NUM_THREADS=1 \
+    --env MKL_NUM_THREADS=1 \
+    --env OPENBLAS_NUM_THREADS=1 \
+    --env NUMEXPR_NUM_THREADS=1 \
     --pwd /queryocc \
     "$CONTAINER" \
     python tools/convert_legacy_queryocc_pseudo_labels.py \
@@ -66,6 +76,7 @@ apptainer exec \
         --depth-root /legacy_depth \
         --output-root /converted \
         --min-complete "$FULL_CONVERSION_EXPECTED_TRAIN" \
+        --workers "$CONVERSION_WORKERS" \
         --require-scores
 
 echo "Full QueryOcc pseudo-label conversion complete: $QUERYOCC_CONVERTED_ROOT"

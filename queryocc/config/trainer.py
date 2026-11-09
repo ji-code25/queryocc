@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Literal, Optional, Union
+from typing import Literal, Optional, Tuple, Union
 
 import yaml
 
@@ -32,6 +32,9 @@ class TrainerConfig:
 
     max_steps: int = 1_000_000
     """The maximum number of steps."""
+
+    max_epochs: Optional[int] = None
+    """Optional maximum number of complete training epochs. ``None`` leaves training step-limited."""
 
     strategy: str = "ddp"  # ddp_find_unused_parameters_true"
     """The strategy for distributed training."""
@@ -97,6 +100,12 @@ class TrainingConfig:
     """Test the model."""
     test_after_fit_ckpt_path: Literal["best", "last"] = "last"
     """The checkpoint to test after training."""
+    test_best_and_last_after_fit: bool = False
+    """Run the complete post-fit test/validation split once from each of the best and last checkpoints."""
+
+    validation_epochs: Tuple[int, ...] = ()
+    """Optional one-based epoch numbers at which in-fit validation is enabled. An empty tuple
+    uses Trainer's ordinary ``check_val_every_n_epoch`` schedule."""
 
     monitor_key: str = "val/total_loss"
     """The key to monitor for early stopping."""

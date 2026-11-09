@@ -174,9 +174,10 @@ def test_convert_legacy_layout_remaps_sky_and_camera_order(tmp_path: Path):
         )
 
     summary = convert_legacy.convert(
-        argparse.Namespace(**conversion_args, dry_run=False)
+        argparse.Namespace(**conversion_args, workers=2, dry_run=False)
     )
     assert summary["converted_records"] == 1
+    assert summary["conversion_workers"] == 2
 
     with np.load(output_root / "semantics" / scene / f"{token}.npz") as archive:
         assert tuple(archive["cam_order"]) == convert_legacy.CAMERA_ORDER
@@ -273,6 +274,26 @@ def test_smoke_launcher_keeps_production_model_and_runs_100_steps():
     assert 'CONVERTED_ROOT="$QUERYOCC_CONVERTED_ROOT"' in prepare_launcher
     assert '--min-complete "$FULL_CONVERSION_EXPECTED_TRAIN"' in full_converter
     assert "FULL_CONVERSION_EXPECTED_TRAIN:-28130" in full_converter
+    assert "#SBATCH --cpus-per-task=16" in full_converter
+    assert "#SBATCH --mem=64G" in full_converter
+    assert "#SBATCH --time=06:00:00" in full_converter
+    assert '--workers "$CONVERSION_WORKERS"' in full_converter
+    assert "OMP_NUM_THREADS=1" in full_converter
+
+
+def test_queryocc_full_training_validation_schedule():
+    preset = (ROOT / "queryocc/config/methods/queryocc.py").read_text()
+    trainer = (ROOT / "queryocc/config/trainer.py").read_text()
+    train = (ROOT / "queryocc/train.py").read_text()
+
+    assert "max_steps=-1" in preset
+    assert "max_epochs=12" in preset
+    assert "validation_epochs=(6, 7, 8, 9, 10, 11)" in preset
+    assert "limit_val_batches=300" in preset
+    assert "shuffle_val=True" in preset
+    assert "test_best_and_last_after_fit=True" in preset
+    assert "validation_epochs: Tuple[int, ...] = ()" in trainer
+    assert '("best", "last")' in train
 
 
 def test_checkpoint_summary_requires_exact_global_step(tmp_path: Path):

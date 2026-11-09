@@ -257,7 +257,9 @@ sbatch scripts/convert_queryocc_pseudo_labels_berzelius.sh
 
 The full job gates on all expected records before writing, skips already converted
 samples, and atomically renames each output pair, so it is safe to resubmit after a
-timeout without duplicating data.
+timeout without duplicating data. Its default request is 16 CPU cores, 64 GB RAM and a
+six-hour limit; all 16 workers convert independent records in parallel while numerical
+libraries are restricted to one thread per worker.
 
 The preparation job writes frozen info files plus `manifest.json` under
 `$QUERYOCC_SMOKE_ROOT/smoke_inputs`. The GPU job writes
