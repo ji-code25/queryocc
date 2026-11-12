@@ -22,9 +22,7 @@ def load_module(name: str, relative_path: str):
 prepare_smoke = load_module("prepare_queryocc_smoke", "tools/prepare_queryocc_smoke.py")
 verify_smoke = load_module("verify_queryocc_smoke", "tools/verify_queryocc_smoke.py")
 collect_smoke = load_module("collect_queryocc_smoke", "tools/collect_queryocc_smoke.py")
-convert_legacy = load_module(
-    "convert_legacy_queryocc_pseudo_labels", "tools/convert_legacy_queryocc_pseudo_labels.py"
-)
+convert_legacy = load_module("convert_legacy_queryocc_pseudo_labels", "tools/convert_legacy_queryocc_pseudo_labels.py")
 
 
 def dump_pickle(path: Path, payload) -> None:
@@ -105,9 +103,7 @@ def test_prepare_and_verify_frozen_queryocc_inputs(tmp_path: Path):
     assert manifest["expected_optimizer_steps"] == 4
     assert manifest["train_sample_budget"] == 4
     assert manifest["checked_archive_contents"]
-    assert set(manifest["dynamic_coverage"]) == {
-        str(value) for value in prepare_smoke.DYNAMIC_CLASS_IDS
-    }
+    assert set(manifest["dynamic_coverage"]) == {str(value) for value in prepare_smoke.DYNAMIC_CLASS_IDS}
     result = verify_smoke.verify(output_dir, 2, 2, 4, check_archives=True)
     assert result == {
         "ok": True,
@@ -141,9 +137,7 @@ def test_convert_legacy_layout_remaps_sky_and_camera_order(tmp_path: Path):
 
     legacy_depth_dir = depth_root / scene
     legacy_depth_dir.mkdir(parents=True)
-    legacy_depth = np.stack(
-        [np.full((2, 3), index + 1, dtype=np.float16) for index in range(6)]
-    )
+    legacy_depth = np.stack([np.full((2, 3), index + 1, dtype=np.float16) for index in range(6)])
     np.save(legacy_depth_dir / f"{token}.npy", legacy_depth)
     record = {"token": token, "scene_name": scene, "scene_token": "scene-token", "cams": cameras}
     infos_path = tmp_path / "infos.pkl"
@@ -159,9 +153,7 @@ def test_convert_legacy_layout_remaps_sky_and_camera_order(tmp_path: Path):
         "max_samples": None,
         "min_complete": None,
     }
-    dry_summary = convert_legacy.convert(
-        argparse.Namespace(**conversion_args, dry_run=True)
-    )
+    dry_summary = convert_legacy.convert(argparse.Namespace(**conversion_args, dry_run=True))
     assert dry_summary["legacy_depth_layout"] == "packed"
     assert dry_summary["complete_records"] == 1
     assert dry_summary["selected_records"] == 1
@@ -169,13 +161,9 @@ def test_convert_legacy_layout_remaps_sky_and_camera_order(tmp_path: Path):
     assert not output_root.exists()
 
     with pytest.raises(RuntimeError, match="only 1 records.*need 2"):
-        convert_legacy.convert(
-            argparse.Namespace(**{**conversion_args, "min_complete": 2}, dry_run=True)
-        )
+        convert_legacy.convert(argparse.Namespace(**{**conversion_args, "min_complete": 2}, dry_run=True))
 
-    summary = convert_legacy.convert(
-        argparse.Namespace(**conversion_args, workers=2, dry_run=False)
-    )
+    summary = convert_legacy.convert(argparse.Namespace(**conversion_args, workers=2, dry_run=False))
     assert summary["converted_records"] == 1
     assert summary["conversion_workers"] == 2
 
@@ -270,7 +258,7 @@ def test_smoke_launcher_keeps_production_model_and_runs_100_steps():
     assert "--check-archives" in prepare_launcher
     assert "SLURM_SUBMIT_DIR" in prepare_launcher
     assert "SLURM_SUBMIT_DIR" in launcher
-    assert "set -a\nsource \"$SCRIPT_DIR/env.local.sh\"\nset +a" in launcher
+    assert 'set -a\nsource "$SCRIPT_DIR/env.local.sh"\nset +a' in launcher
     assert 'CONVERTED_ROOT="$QUERYOCC_CONVERTED_ROOT"' in prepare_launcher
     assert '--min-complete "$FULL_CONVERSION_EXPECTED_TRAIN"' in full_converter
     assert "FULL_CONVERSION_EXPECTED_TRAIN:-28130" in full_converter
@@ -287,13 +275,41 @@ def test_queryocc_full_training_validation_schedule():
     train = (ROOT / "queryocc/train.py").read_text()
 
     assert "max_steps=-1" in preset
-    assert "max_epochs=12" in preset
-    assert "validation_epochs=(6, 7, 8, 9, 10, 11)" in preset
-    assert "limit_val_batches=300" in preset
-    assert "shuffle_val=True" in preset
-    assert "test_best_and_last_after_fit=True" in preset
+    assert "max_epochs=16" in preset
+    assert "checkpoint_epochs=(10, 11, 12, 13, 14, 15, 16)" in preset
+    assert "validation_epochs=()" in preset
+    assert "limit_val_batches=0" in preset
+    assert "shuffle_val=False" in preset
+    assert "occ3d_only_eval=True" in preset
+    assert "test_best_and_last_after_fit=False" in preset
     assert "validation_epochs: Tuple[int, ...] = ()" in trainer
     assert '("best", "last")' in train
+    assert "EpochRecoveryCheckpoint" in train
+    assert "ScheduledEpochCheckpoint" in train
+
+
+def test_queryocc_full_berzelius_resource_and_dependency_workflow():
+    training = (ROOT / "scripts/train_queryocc_full_berzelius.sh").read_text()
+    evaluation = (ROOT / "scripts/evaluate_queryocc_full_berzelius.sh").read_text()
+    submission = (ROOT / "scripts/submit_queryocc_full_berzelius.sh").read_text()
+    selector = (ROOT / "scripts/select_queryocc_best_berzelius.sh").read_text()
+
+    assert "#SBATCH --gpus-per-node=A100-SXM4-80GB:4" in training
+    assert "#SBATCH --constraint=fat" in training
+    assert "#SBATCH --time=24:00:00" in training
+    assert "#SBATCH --account=berzelius-2026-281" in training
+    assert "--trainer.limit-val-batches=0" in training
+
+    assert "#SBATCH --gpus-per-node=A100-SXM4-40GB:1" in evaluation
+    assert "#SBATCH --constraint=thin" in evaluation
+    assert "--trainer.limit-test-batches=1.0" in evaluation
+    assert "--evaluation-results-path=" in evaluation
+    assert "--array=10-16" in submission
+    assert "afterok:$prepare_job" in submission
+    assert "afterok:$smoke_job" in submission
+    assert "afterok:$train_job" in submission
+    assert "afterok:$evaluation_job" in submission
+    assert "select_best_queryocc_checkpoint.py" in selector
 
 
 def test_checkpoint_summary_requires_exact_global_step(tmp_path: Path):

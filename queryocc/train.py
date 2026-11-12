@@ -22,6 +22,7 @@ arguments matters:
 
 import functools
 import glob
+import json
 import logging
 from copy import deepcopy
 from datetime import timedelta
@@ -35,7 +36,12 @@ from lightning.pytorch.loggers import WandbLogger
 from lightning.pytorch.profilers import AdvancedProfiler, PyTorchProfiler
 from lightning.pytorch.strategies import DDPStrategy
 
-from queryocc.callbacks.checkpoint import FinalStepModelCheckpoint, WeightsOnlyCheckpoint
+from queryocc.callbacks.checkpoint import (
+    EpochRecoveryCheckpoint,
+    FinalStepModelCheckpoint,
+    ScheduledEpochCheckpoint,
+    WeightsOnlyCheckpoint,
+)
 from queryocc.callbacks.sampler import ValidationEpochScheduler, ValidationSamplerEpochSetter
 from queryocc.config.method_configs import AnnotatedBaseConfigUnion, convert_markup_to_ansi
 from queryocc.config.trainer import TrainingConfig
@@ -75,7 +81,7 @@ def is_large_node():
 
 def validate_loaded_checkpoint_config(config: TrainingConfig):
     assert config.load_ckpt_from is not None and config.load_ckpt_from.exists(), "Checkpoint not found"
-    config_path = config.load_ckpt_from.parent.parent.parent.parent / "config.yml"
+    config_path = find_checkpoint_config(config.load_ckpt_from)
     assert config_path.exists(), f"Config not found at {config_path}"
     loaded_config = TrainingConfig.load_config_from_yaml(config_path)
 
@@ -107,6 +113,15 @@ def validate_loaded_checkpoint_config(config: TrainingConfig):
         )
 
     del loaded_config
+
+
+def find_checkpoint_config(checkpoint_path: Path) -> Path:
+    """Return the nearest ancestor config for an experiment checkpoint."""
+    for parent in checkpoint_path.parents:
+        candidate = parent / "config.yml"
+        if candidate.is_file():
+            return candidate
+    raise FileNotFoundError(f"No config.yml found above checkpoint {checkpoint_path}")
 
 
 def scale_with_num_gpus(config: TrainingConfig) -> None:
@@ -213,6 +228,63 @@ def get_checkpoint(checkpoint_folder: Path, best: bool = True) -> Path:
     return Path(ckpt)
 
 
+def build_checkpoint_callbacks(config: TrainingConfig):
+    """Create independent metric-best, scheduled, and recovery checkpoints."""
+    best_checkpoint_callback = None
+    if config.trainer.limit_val_batches != 0:
+        best_checkpoint_callback = FinalStepModelCheckpoint(
+            monitor=config.monitor_key,
+            save_top_k=1,
+            mode=config.monitor_mode,
+            save_last=False,
+        )
+    recovery_checkpoint_callback = EpochRecoveryCheckpoint(
+        monitor=None,
+        save_top_k=0,
+        save_last=True,
+        every_n_epochs=1,
+        save_on_train_epoch_end=True,
+    )
+    scheduled_checkpoint_callback = (
+        ScheduledEpochCheckpoint(config.checkpoint_epochs) if config.checkpoint_epochs else None
+    )
+    return best_checkpoint_callback, recovery_checkpoint_callback, scheduled_checkpoint_callback
+
+
+def _json_safe(value):
+    if isinstance(value, torch.Tensor):
+        return value.detach().cpu().item() if value.numel() == 1 else value.detach().cpu().tolist()
+    if isinstance(value, Path):
+        return str(value)
+    if isinstance(value, dict):
+        return {str(key): _json_safe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_safe(item) for item in value]
+    return value
+
+
+def write_evaluation_results(config: TrainingConfig, results) -> None:
+    """Atomically persist one standalone full-validation result."""
+    if config.evaluation_results_path is None:
+        return
+    if config.load_ckpt_from is None:
+        raise ValueError("evaluation_results_path requires load_ckpt_from")
+    if len(results) != 1:
+        raise RuntimeError(f"Expected one test dataloader result, got {len(results)}")
+
+    output_path = config.evaluation_results_path
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "schema_version": 1,
+        "checkpoint_path": str(config.load_ckpt_from.resolve()),
+        "checkpoint_epoch": config.evaluation_checkpoint_epoch,
+        "metrics": _json_safe(results[0]),
+    }
+    temporary_path = output_path.with_suffix(output_path.suffix + ".tmp")
+    temporary_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    temporary_path.replace(output_path)
+
+
 def check_release_checkpoint(header: dict, config: TrainingConfig) -> None:
     """Refuse a released checkpoint that was trained with a different preset.
 
@@ -259,7 +331,7 @@ def load_model_weights_from_checkpoint(config: TrainingConfig) -> BaseModel:
         is_from_pretrain = True  # released weights are always a trained QueryOcc network
     elif config.validate_config:
         validate_loaded_checkpoint_config(config)
-        config_path = config.load_ckpt_from.parent.parent.parent.parent / "config.yml"
+        config_path = find_checkpoint_config(config.load_ckpt_from)
         assert config_path.exists(), f"Config not found at {config_path}"
         loaded_config = TrainingConfig.load_config_from_yaml(config_path)
         is_from_pretrain = isinstance(loaded_config.model, PreTrainConfig)
@@ -309,13 +381,18 @@ def main(config: TrainingConfig):
 
     wandb_logger = get_wandb_logger(config, model.__class__.__name__)
 
+    best_checkpoint_callback, recovery_checkpoint_callback, scheduled_checkpoint_callback = build_checkpoint_callbacks(
+        config
+    )
     callbacks = [
-        FinalStepModelCheckpoint(
-            monitor=config.monitor_key,
-            save_top_k=1,
-            mode=config.monitor_mode,
-            save_last=True,
-        ),
+        callback
+        for callback in (
+            best_checkpoint_callback,
+            scheduled_checkpoint_callback,
+            recovery_checkpoint_callback,
+        )
+        if callback is not None
+    ] + [
         cb.LearningRateMonitor(logging_interval="step"),
         ValidationSamplerEpochSetter(),
     ]
@@ -458,15 +535,28 @@ def main(config: TrainingConfig):
             )
 
         if config.test:
-            checkpoint_paths = (
+            available_checkpoint_paths = {
+                "best": best_checkpoint_callback.best_model_path if best_checkpoint_callback else "",
+                "last": recovery_checkpoint_callback.last_model_path,
+            }
+            checkpoint_names = (
                 ("best", "last") if config.test_best_and_last_after_fit else (config.test_after_fit_ckpt_path,)
             )
-            for checkpoint_path in checkpoint_paths:
-                logger.info("Running complete post-fit evaluation from the %s checkpoint", checkpoint_path)
+            for checkpoint_name in checkpoint_names:
+                checkpoint_path = available_checkpoint_paths[checkpoint_name]
+                if not checkpoint_path:
+                    raise RuntimeError(f"No {checkpoint_name} checkpoint was saved before post-fit evaluation")
+                logger.info(
+                    "Running complete post-fit evaluation from the %s checkpoint: %s",
+                    checkpoint_name,
+                    checkpoint_path,
+                )
                 trainer.test(model, datamodule=dm, ckpt_path=checkpoint_path, weights_only=False)
 
     if config.test and not config.train:
-        trainer.test(model=model, datamodule=dm)
+        test_results = trainer.test(model=model, datamodule=dm)
+        if trainer.is_global_zero:
+            write_evaluation_results(config, test_results)
 
     return model
 

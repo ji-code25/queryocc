@@ -54,9 +54,13 @@ class TestReleasePresets:
         assert c.model.net.cerveza_encoder.lss.depth_gamma == 0.3
         assert c.model.net.cerveza_encoder.lss.max_depth == 100.0
         assert c.trainer.max_steps == -1
-        assert c.trainer.max_epochs == 12
-        assert c.validation_epochs == (6, 7, 8, 9, 10, 11)
+        assert c.trainer.max_epochs == 16
+        assert c.trainer.limit_val_batches == 0
+        assert c.validation_epochs == ()
+        assert c.checkpoint_epochs == (10, 11, 12, 13, 14, 15, 16)
+        assert not c.test
         assert c.monitor_key == "val/occ3d/metrics/occ3d_binary_rayiou/max_binary_rayiou"
+        assert c.model.occ3d_only_eval
         assert c.datamodule.dataset.image_size == (256, 704)
         assert c.datamodule.dataset.num_future_frames_to_sample == 3
         assert c.datamodule.dataset.num_past_frames_to_sample == 3

@@ -25,7 +25,7 @@ from queryocc.common import paths
 # Bumped whenever the cached structure changes, so stale caches are rebuilt rather than
 # silently served. v3: the lidar pool is the full 20 Hz stream again — v2 wrongly applied
 # only_tokens_for_offsets (a camera-only setting) to it, cutting the pool ~10x.
-CACHE_SCHEMA_VERSION = "devkit_lidar_frames_v3"
+CACHE_SCHEMA_VERSION = "devkit_lidar_frames_v4"
 
 # The nuScenes camera rig, in the canonical order used everywhere.
 NUSCENES_CAMERAS = (
@@ -51,6 +51,7 @@ def cache_path(config, train_or_val: str, split: str) -> Path:
         train_or_val,
         config.version,
         split,
+        index_tag(config),
         list(config.nuscenes_cameras_to_load),
         config.only_tokens_for_offsets,
         CACHE_SCHEMA_VERSION,

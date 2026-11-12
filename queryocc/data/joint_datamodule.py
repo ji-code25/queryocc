@@ -1,4 +1,5 @@
 import logging
+from copy import deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Literal, Optional, Tuple, Type
@@ -150,6 +151,38 @@ class JointDataModule(LightningDataModule):
         """
         pass
 
+    def _dataset_configs(self) -> Tuple[ZODBaseDatasetConfig, ZODBaseDatasetConfig]:
+        """Return isolated train/eval configs with eval supervision removed.
+
+        ``PreTrainConfig.configure_dataset`` attaches the private policy flag;
+        keeping it private prevents a second, conflicting CLI switch on the
+        datamodule.  Deep copies are essential because VFM reader settings are
+        nested mutable dataclasses.
+        """
+        train_config = deepcopy(self.config.dataset)
+        eval_config = deepcopy(self.config.dataset)
+
+        if getattr(eval_config, "_occ3d_only_eval", False):
+            eval_config.load_vfm_stuff = False
+            eval_config.load_depth_maps = False
+            eval_config.load_offset_pointclouds = False
+            eval_config.load_offset_panoptic_labels = False
+            eval_config.load_current_lidar_panoptic_labels = False
+            eval_config.add_missing_points = False
+
+            eval_config.vfm_cfg.read_metric3d_depth = False
+            eval_config.vfm_cfg.read_grounding_sam = False
+            eval_config.vfm_cfg.read_grounding_sam_scores = False
+            eval_config.vfm_cfg.create_pseudo_pointclouds = False
+
+        return train_config, eval_config
+
+    @staticmethod
+    def _dataset_kwargs(config: ZODBaseDatasetConfig) -> dict:
+        # Exclude runtime-only policy attributes such as
+        # ``_occ3d_only_eval`` before constructing the concrete dataset config.
+        return {key: value for key, value in config.__dict__.items() if not key.startswith("_")}
+
     def setup(self, stage: Optional[str] = None) -> None:
         """Load data. Set variables: `self.data_train`, `self.data_val`, `self.data_test`.
 
@@ -184,34 +217,42 @@ class JointDataModule(LightningDataModule):
         if not self.data_train and not self.data_val and not self.data_test:
             train_datasets = []
             val_datasets = []
+            train_config, eval_config = self._dataset_configs()
 
             for dataset_name in self.config.datasets_to_include:
                 if dataset_name == "sensor":
-                    dataset_cfg = self.config.dataset.__dict__.copy()
+                    train_dataset_cfg = self._dataset_kwargs(train_config)
+                    eval_dataset_cfg = self._dataset_kwargs(eval_config)
                     av2_cfg = self.config.av2_cfg.__dict__.copy()
-                    dataset_cfg = {**av2_cfg, **dataset_cfg}
-                    dataset_cfg["data"] = self.config.av2_data
-                    dataset_cfg["subset"] = "sensor"
-                    dataset_train = AV2DatasetConfig(**dataset_cfg).setup(
+                    train_dataset_cfg = {**av2_cfg, **train_dataset_cfg}
+                    eval_dataset_cfg = {**av2_cfg, **eval_dataset_cfg}
+                    train_dataset_cfg["data"] = self.config.av2_data
+                    eval_dataset_cfg["data"] = self.config.av2_data
+                    train_dataset_cfg["subset"] = "sensor"
+                    eval_dataset_cfg["subset"] = "sensor"
+                    dataset_train = AV2DatasetConfig(**train_dataset_cfg).setup(
                         train_or_val="train", split=f"sensor_{self.config.splits}"
                     )
-                    dataset_val = AV2DatasetConfig(**dataset_cfg).setup(
+                    dataset_val = AV2DatasetConfig(**eval_dataset_cfg).setup(
                         train_or_val="val", split=f"sensor_{self.config.splits}"
                     )
                     train_datasets.append(dataset_train)
                     val_datasets.append(dataset_val)
 
                 elif "nuscenes" in dataset_name:
-                    dataset_cfg = self.config.dataset.__dict__.copy()
-                    dataset_cfg["data"] = self.config.nuscenes_data
+                    train_dataset_cfg = self._dataset_kwargs(train_config)
+                    eval_dataset_cfg = self._dataset_kwargs(eval_config)
+                    train_dataset_cfg["data"] = self.config.nuscenes_data
+                    eval_dataset_cfg["data"] = self.config.nuscenes_data
 
                     if "only_tokens" in dataset_name:
-                        dataset_cfg["only_tokens"] = True
+                        train_dataset_cfg["only_tokens"] = True
+                        eval_dataset_cfg["only_tokens"] = True
 
-                    dataset_train = NuScenesDatasetConfig(**dataset_cfg).setup(
+                    dataset_train = NuScenesDatasetConfig(**train_dataset_cfg).setup(
                         train_or_val="train", split=self.config.splits
                     )
-                    dataset_val = NuScenesDatasetConfig(**dataset_cfg).setup(
+                    dataset_val = NuScenesDatasetConfig(**eval_dataset_cfg).setup(
                         train_or_val="val", split=self.config.splits
                     )
                     train_datasets.append(dataset_train)

@@ -56,6 +56,28 @@ export MASTER_PORT=$(find_free_port)
 # Full name including slurm job id
 full_name=$name-$SLURM_JOB_ID
 
+# A queued Slurm job keeps the batch-script contents captured by sbatch.  A
+# site can therefore use this narrowly scoped override to correct a saved
+# --datamodule.num-workers value without cancelling the job and losing its
+# queue age.  Set both variables in env.local.sh to limit the override to one
+# job; future submissions continue to use the value in train_multi_gpu.sh.
+trainer_args=("${@:3}")
+if [ -n "${QUERYOCC_NUM_WORKERS_OVERRIDE:-}" ] && \
+   { [ -z "${QUERYOCC_NUM_WORKERS_OVERRIDE_JOB_ID:-}" ] || \
+     [ "${SLURM_JOB_ID:-}" = "$QUERYOCC_NUM_WORKERS_OVERRIDE_JOB_ID" ]; }; then
+    worker_option_found=0
+    for arg_index in "${!trainer_args[@]}"; do
+        if [[ "${trainer_args[$arg_index]}" == --datamodule.num-workers=* ]]; then
+            trainer_args[$arg_index]="--datamodule.num-workers=$QUERYOCC_NUM_WORKERS_OVERRIDE"
+            worker_option_found=1
+        fi
+    done
+    if [ "$worker_option_found" -eq 0 ]; then
+        trainer_args+=("--datamodule.num-workers=$QUERYOCC_NUM_WORKERS_OVERRIDE")
+    fi
+    echo "Applying num-workers override for Slurm job ${SLURM_JOB_ID}: ${QUERYOCC_NUM_WORKERS_OVERRIDE} per rank"
+fi
+
 # Normally the container runs the trainer. Set ENTRYPOINT to run something else under the
 # exact same image and bind mounts -- diagnostics that must see the data exactly the way
 # training does, e.g.
@@ -66,7 +88,7 @@ if [ -n "${ENTRYPOINT:-}" ]; then
     read -r -a COMMAND <<< "$ENTRYPOINT"
 else
     COMMAND=(python -u queryocc/train.py ${2} --exp-name="$full_name" \
-        --trainer.accumulate_grad_batches=2 "${@:3}")
+        --trainer.accumulate_grad_batches=2 "${trainer_args[@]}")
 fi
 
 apptainer exec --nv \

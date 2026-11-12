@@ -257,9 +257,23 @@ sbatch scripts/convert_queryocc_pseudo_labels_berzelius.sh
 
 The full job gates on all expected records before writing, skips already converted
 samples, and atomically renames each output pair, so it is safe to resubmit after a
-timeout without duplicating data. Its default request is 16 CPU cores, 64 GB RAM and a
-six-hour limit; all 16 workers convert independent records in parallel while numerical
-libraries are restricted to one thread per worker.
+timeout without duplicating data. It then validates the converted archives, writes a
+blacklist plus `queryocc-refined` filtered train/val infos, and precomputes the derived
+dataset cache. Its default request is 16 CPU cores, 64 GB RAM and a six-hour limit.
+
+The production Berzelius workflow trains for 16 complete epochs without in-fit
+validation, retaining immutable checkpoints for epochs 10 through 16 plus a rolling
+`last.ckpt` recovery file. Training uses four fat 80 GB A100s for up to 24 hours. Seven
+dependent array tasks then run full Occ3D validation, one epoch checkpoint per thin
+40 GB A100, and a CPU finalizer selects the highest Semantic RayIoU checkpoint:
+
+```bash
+scripts/submit_queryocc_full_berzelius.sh
+```
+
+The run root contains `checkpoint_manifest.json`, seven JSON files under
+`full_validation/`, `evaluation_summary.json`, `best_checkpoint.txt`, and a stable
+`best.ckpt` symlink.
 
 The preparation job writes frozen info files plus `manifest.json` under
 `$QUERYOCC_SMOKE_ROOT/smoke_inputs`. The GPU job writes
@@ -277,7 +291,8 @@ to fit an ordinary 40 GB Berzelius A100.
 | `queryocc-joint-nusc` | pseudo point clouds **and** real lidar | nuScenes |
 | `queryocc-nusc-av2` | real lidar | nuScenes + Argoverse 2 |
 
-Training runs a full evaluation on the test split after fitting, using the best checkpoint.
+The production workflow evaluates the retained epoch checkpoints after fitting; standalone
+evaluation remains available for any checkpoint.
 
 ## Evaluation
 

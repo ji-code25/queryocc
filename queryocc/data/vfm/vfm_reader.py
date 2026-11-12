@@ -1088,44 +1088,54 @@ class VFMReader:
             pointcloud_t_idx_out = np.concatenate(pointcloud_t_idx, axis=0)
             missing_rays_t_idx_out = np.concatenate(missing_rays_t_idx, axis=0)
 
+        pseudo_supervision_valid = len(pointclouds_out) > 0
         if self.config.pad_pseudo_data_for_batching:
             # Pad/cap every variable-length output to a fixed size so samples can be stacked at
             # batch_size > 1. Note that ratio_inside is computed from the real counts above, so
             # the point/ray balance in the occupancy sampler is unaffected by the padding.
-            if len(pointclouds_out) == 0:
-                raise ValueError(
-                    "Got a sample with zero pseudo points (no positive depth pixels in any timestep); "
-                    "cannot pad it for batching. This sample should be blacklisted."
-                )
-            idx = resize_first_dim_indices(len(pointclouds_out), self.config.n_max_pseudo_points)
-            if idx is not None:
-                pointclouds_out = pointclouds_out[idx]
-                thw_image_coords_out = thw_image_coords_out[idx]
-                pointcloud_t_idx_out = pointcloud_t_idx_out[idx]
-                if self.config.pseudo_pointclouds_labels:
-                    pointclouds_labels_out = pointclouds_labels_out[idx]
-                    if vfm_scores is not None:
-                        pointcloud_label_valids = pointcloud_label_valids[idx]
-
-            if len(missing_rays_out) > 0:
-                ray_idx = resize_first_dim_indices(len(missing_rays_out), self.config.n_max_pseudo_missing_rays)
-                if ray_idx is not None:
-                    missing_rays_out = missing_rays_out[ray_idx]
-                    missing_rays_t_idx_out = missing_rays_t_idx_out[ray_idx]
+            if not pseudo_supervision_valid:
+                # The full-data preflight blacklists samples with no usable raw pixels, but a
+                # particular random temporal/camera draw can still be empty. Keep the batch
+                # collatable with finite non-degenerate dummy geometry and mark the entire
+                # sample invalid; training_step then removes this rank's pseudo loss.
+                num_points = self.config.n_max_pseudo_points
+                num_rays = self.config.n_max_pseudo_missing_rays
+                if num_points < 1 or num_rays < 1:
+                    raise ValueError("padded pseudo data requires positive point and ray capacities")
+                pointclouds_out = np.zeros((num_points, 4), dtype=np.float32)
+                pointclouds_out[:, 2] = 1.0
+                missing_rays_out = np.zeros((num_rays, 4), dtype=np.float32)
+                missing_rays_out[:, 2] = 1.0
+                thw_image_coords_out = np.zeros((num_points, 3), dtype=np.int64)
+                pointcloud_t_idx_out = np.zeros(num_points, dtype=np.int64)
+                missing_rays_t_idx_out = np.zeros(num_rays, dtype=np.int64)
+                noise_idx = self.label_mapper.noise_idx if self.label_mapper is not None else 0
+                pointclouds_labels_out = np.full(num_points, noise_idx, dtype=np.int32)
+                pointcloud_label_valids = np.zeros(num_points, dtype=bool)
+                ratio_inside = 1.0
             else:
-                # Every point landed in range: there are no missing rays. We cannot pad with zeros
-                # — (0,0,0) ray points are degenerate in the occupancy sampler (direction = vec/||vec||
-                # with a near-zero numerator, and the ray-box intersection then produces NaN), and a
-                # padded-but-nonempty array also defeats the sampler's per-sample "no rays available"
-                # check, so a batch mate with ratio_inside < 1 would actually draw from this garbage.
-                # Pad with copies of this sample's own in-range points instead: valid, non-degenerate
-                # coordinates. The few resulting ray-negatives (sampled between the origin and an
-                # occupied point) are harmless for the rare all-in-range sample. pointclouds_out is
-                # guaranteed non-empty here (we raise above if a sample has zero pseudo points).
-                fill = resize_first_dim_indices(len(pointclouds_out), self.config.n_max_pseudo_missing_rays)
-                fill = np.arange(len(pointclouds_out)) if fill is None else fill
-                missing_rays_out = pointclouds_out[fill].astype(np.float32)
-                missing_rays_t_idx_out = pointcloud_t_idx_out[fill]
+                idx = resize_first_dim_indices(len(pointclouds_out), self.config.n_max_pseudo_points)
+                if idx is not None:
+                    pointclouds_out = pointclouds_out[idx]
+                    thw_image_coords_out = thw_image_coords_out[idx]
+                    pointcloud_t_idx_out = pointcloud_t_idx_out[idx]
+                    if self.config.pseudo_pointclouds_labels:
+                        pointclouds_labels_out = pointclouds_labels_out[idx]
+                        if vfm_scores is not None:
+                            pointcloud_label_valids = pointcloud_label_valids[idx]
+
+                if len(missing_rays_out) > 0:
+                    ray_idx = resize_first_dim_indices(len(missing_rays_out), self.config.n_max_pseudo_missing_rays)
+                    if ray_idx is not None:
+                        missing_rays_out = missing_rays_out[ray_idx]
+                        missing_rays_t_idx_out = missing_rays_t_idx_out[ray_idx]
+                else:
+                    # Use copies of valid in-range points instead of zero rays, whose
+                    # degenerate direction would produce NaNs in ray-box intersection.
+                    fill = resize_first_dim_indices(len(pointclouds_out), self.config.n_max_pseudo_missing_rays)
+                    fill = np.arange(len(pointclouds_out)) if fill is None else fill
+                    missing_rays_out = pointclouds_out[fill].astype(np.float32)
+                    missing_rays_t_idx_out = pointcloud_t_idx_out[fill]
 
             num_poses = sliced_ego_motion.timestamps.shape[0]
             n_max_poses = self.config.n_max_pseudo_ego_poses
@@ -1157,6 +1167,7 @@ class VFMReader:
         out["pseudo_pointcloud_t_idx"] = pointcloud_t_idx_out
         out["pseudo_missing_rays_t_idx"] = missing_rays_t_idx_out
         out["pseudo_pointcloud_valids"] = np.ones((pointclouds.shape[0], 1), dtype=bool)
+        out["pseudo_supervision_valid"] = np.asarray(pseudo_supervision_valid, dtype=bool)
         if self.config.pseudo_pointclouds_labels:
             out["pseudo_pointcloud_labels"] = np.expand_dims(pointclouds_labels, axis=-1)
             if vfm_scores is not None:

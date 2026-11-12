@@ -50,6 +50,12 @@ class PreTrainConfig(ModelConfig):
 
     compute_occ3d_metrics: bool = False
     """ Whether to compute occ3d metrics or not """
+    occ3d_only_eval: bool = False
+    """Run validation/test from images and Occ3D targets only.
+
+    Training supervision is unchanged.  The corresponding datamodule policy is
+    propagated by :meth:`configure_dataset`, so this is the only public switch.
+    """
     probe_occ3d_setting: Literal[1, 2] = 1
     """ The setting to use for the probe occ3d. 1: probe at the voxel centers, 2: probe at the
     voxel corners. """
@@ -95,9 +101,15 @@ class PreTrainConfig(ModelConfig):
 
     def __post_init__(self) -> None:
         super().__post_init__()
+        if self.occ3d_only_eval and not self.compute_occ3d_metrics:
+            raise ValueError("occ3d_only_eval requires compute_occ3d_metrics=True")
 
     def configure_dataset(self, dataset: ZODBaseDatasetConfig):  # pragma: no cover
         super().configure_dataset(dataset)
+        # Runtime-only policy consumed by JointDataModule.  It deliberately is
+        # not a public datamodule field/CLI option: --model.occ3d-only-eval is
+        # the single source of truth.
+        dataset._occ3d_only_eval = self.occ3d_only_eval
         dataset.load_offset_pointclouds = self.net.need_offset_pointclouds
 
         if self.net.need_vfm_stuff:
@@ -209,7 +221,7 @@ class PreTrainModel(PreTrainProbe, PreTrainMetrics, PreTrainLogging, BaseModel):
         camera = self._get_camera_data(batch)
         return self.net.encode(lidar, camera)  # type: ignore
 
-    def step(self, batch: dict, batch_idx: int) -> dict:
+    def step(self, batch: dict, batch_idx: int, include_supervision: bool = True) -> dict:
         bs = len(batch["id"])
 
         if self.config.freeze_encoder:
@@ -228,7 +240,8 @@ class PreTrainModel(PreTrainProbe, PreTrainMetrics, PreTrainLogging, BaseModel):
             res["info"]["bev_features"] = bev_feats
 
         if (
-            self.config.net.image_encoder_name == "cerveza"
+            include_supervision
+            and self.config.net.image_encoder_name == "cerveza"
             and self.config.net.cerveza_encoder.lss.supervise_depth
             and "depth_maps" in batch
         ):
@@ -239,7 +252,7 @@ class PreTrainModel(PreTrainProbe, PreTrainMetrics, PreTrainLogging, BaseModel):
         if self._do_occ3d_step:
             res = self._step_occ3d(batch, bev_feats, res)
 
-        if self.net.config.use_one_head:
+        if include_supervision and self.net.config.use_one_head:
             res = self._step_one_head(batch, bev_feats, res)
 
         res = detach_dict(res, skip_keys=["loss"])
@@ -449,7 +462,15 @@ class PreTrainModel(PreTrainProbe, PreTrainMetrics, PreTrainLogging, BaseModel):
 
     def training_step(self, batch: dict, batch_idx: int) -> Optional[dict]:
         if self.net.one_head_decoder.require_pseudo_occupancy and "pseudo_pointcloud" in batch:
-            local_valid = batch["pseudo_pointcloud"].new_tensor(float(batch["pseudo_pointcloud"].shape[1] > 0))
+            sample_valid = batch.get("pseudo_supervision_valid")
+            if sample_valid is None:
+                local_is_valid = batch["pseudo_pointcloud"].shape[1] > 0
+            else:
+                # Losses are reduced across the rank's whole batch. If even one sample
+                # is a padding-only fallback, suppress this rank's pseudo loss rather
+                # than allowing the dummy occupancy targets to contribute.
+                local_is_valid = bool(sample_valid.all().item())
+            local_valid = batch["pseudo_pointcloud"].new_tensor(float(local_is_valid))
             valid_ranks = local_valid.clone()
             world_size = 1
             if torch.distributed.is_available() and torch.distributed.is_initialized():
@@ -474,12 +495,16 @@ class PreTrainModel(PreTrainProbe, PreTrainMetrics, PreTrainLogging, BaseModel):
 
     def validation_step(self, batch: dict, batch_idx: int) -> dict:
         with torch.no_grad():
-            res = self.step(batch, batch_idx)
+            res = self.step(batch, batch_idx, include_supervision=not self.config.occ3d_only_eval)
 
         if self.config.compute_occ3d_metrics:
             self._compute_occ3d_metrics(batch, res, "val")
 
-        self._log_val(batch, res)
+        # Occ3D-only evaluation has no pseudo/depth loss by design; logging a
+        # zero val/total_loss would be misleading.  Occ3D epoch metrics are
+        # still accumulated and logged by the normal metrics hooks.
+        if not self.config.occ3d_only_eval:
+            self._log_val(batch, res)
         return res
 
     def test_step(self, batch: dict, batch_idx: int) -> dict:
@@ -487,7 +512,7 @@ class PreTrainModel(PreTrainProbe, PreTrainMetrics, PreTrainLogging, BaseModel):
             return {}
 
         with torch.no_grad():
-            res = self.step(batch, batch_idx)
+            res = self.step(batch, batch_idx, include_supervision=not self.config.occ3d_only_eval)
 
         if self.config.compute_occ3d_metrics:
             self._compute_occ3d_metrics(batch, res, "test")

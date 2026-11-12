@@ -103,6 +103,15 @@ class TrainingConfig:
     test_best_and_last_after_fit: bool = False
     """Run the complete post-fit test/validation split once from each of the best and last checkpoints."""
 
+    checkpoint_epochs: Tuple[int, ...] = ()
+    """Optional one-based epoch numbers whose complete training checkpoints are retained.
+    These immutable snapshots are separate from the rolling ``last.ckpt`` recovery file."""
+
+    evaluation_results_path: Optional[Path] = None
+    """Write standalone test metrics and checkpoint provenance to this JSON file."""
+    evaluation_checkpoint_epoch: Optional[int] = None
+    """Optional one-based epoch label recorded in ``evaluation_results_path``."""
+
     validation_epochs: Tuple[int, ...] = ()
     """Optional one-based epoch numbers at which in-fit validation is enabled. An empty tuple
     uses Trainer's ordinary ``check_val_every_n_epoch`` schedule."""
