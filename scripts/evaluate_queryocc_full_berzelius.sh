@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=5
 #SBATCH --time=12:00:00
 #SBATCH --output=/proj/agp/users/%u/logs/%A_%a.out
-#SBATCH --account=berzelius-2026-281
+#SBATCH --account=berzelius-2026-289
 #SBATCH --job-name=queryocc_fullval
 #
 
@@ -21,7 +21,11 @@ if (( EPOCH < 10 || EPOCH > 16 )); then
     exit 2
 fi
 
-SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+if [[ -n "${SLURM_SUBMIT_DIR:-}" && -f "$SLURM_SUBMIT_DIR/scripts/env.local.sh" ]]; then
+    SCRIPT_DIR="$SLURM_SUBMIT_DIR/scripts"
+else
+    SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+fi
 if [[ ! -f "$SCRIPT_DIR/env.local.sh" ]]; then
     echo "Missing $SCRIPT_DIR/env.local.sh" >&2
     exit 2
@@ -39,6 +43,11 @@ FULL_TRAINING_INFOS_TAG=${FULL_TRAINING_INFOS_TAG:-queryocc-refined}
 RUN_NAME=${RUN_NAME:-queryocc-nusc-full16}
 RUN_ROOT="$OUTPUT_DIR/experiments/$RUN_NAME-$TRAIN_JOB_ID"
 RESULTS_DIR="$RUN_ROOT/full_validation"
+
+if [[ "${QUERYOCC_LAUNCH_PREFLIGHT_ONLY:-0}" == "1" ]]; then
+    echo "QueryOcc full-validation launch preflight passed: $REPO_ROOT"
+    exit 0
+fi
 
 if [[ ! -s "$RUN_ROOT/checkpoint_manifest.json" ]]; then
     echo "Missing checkpoint manifest: $RUN_ROOT/checkpoint_manifest.json" >&2

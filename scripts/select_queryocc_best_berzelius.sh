@@ -6,14 +6,18 @@
 #SBATCH --mem=4G
 #SBATCH --time=00:15:00
 #SBATCH --output=/proj/agp/users/%u/logs/%j.out
-#SBATCH --account=berzelius-2026-281
+#SBATCH --account=berzelius-2026-289
 #SBATCH --job-name=queryocc_select
 #
 
 set -euo pipefail
 
 : "${TRAIN_JOB_ID:?Export TRAIN_JOB_ID when submitting the result selector}"
-SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+if [[ -n "${SLURM_SUBMIT_DIR:-}" && -f "$SLURM_SUBMIT_DIR/scripts/env.local.sh" ]]; then
+    SCRIPT_DIR="$SLURM_SUBMIT_DIR/scripts"
+else
+    SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+fi
 if [[ ! -f "$SCRIPT_DIR/env.local.sh" ]]; then
     echo "Missing $SCRIPT_DIR/env.local.sh" >&2
     exit 2
@@ -28,6 +32,11 @@ CONTAINER=${CONTAINER:-"$PROJECT_ROOT/containers/queryocc.sif"}
 OUTPUT_DIR=${OUTPUT_DIR:-"$PROJECT_ROOT"}
 RUN_NAME=${RUN_NAME:-queryocc-nusc-full16}
 container_run_root="/outputs/experiments/$RUN_NAME-$TRAIN_JOB_ID"
+
+if [[ "${QUERYOCC_LAUNCH_PREFLIGHT_ONLY:-0}" == "1" ]]; then
+    echo "QueryOcc best-checkpoint selector launch preflight passed: $REPO_ROOT"
+    exit 0
+fi
 
 apptainer exec \
     --bind "$REPO_ROOT":/queryocc:ro \

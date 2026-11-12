@@ -296,20 +296,84 @@ def test_queryocc_full_berzelius_resource_and_dependency_workflow():
 
     assert "#SBATCH --gpus-per-node=A100-SXM4-80GB:4" in training
     assert "#SBATCH --constraint=fat" in training
-    assert "#SBATCH --time=24:00:00" in training
-    assert "#SBATCH --account=berzelius-2026-281" in training
+    assert "#SBATCH --cpus-per-task=16" in training
+    assert "#SBATCH --time=19:00:00" in training
+    assert "#SBATCH --account=berzelius-2026-289" in training
+    assert "WORKERS_PER_GPU=${WORKERS_PER_GPU:-4}" in training
     assert "--trainer.limit-val-batches=0" in training
+    assert "SLURM_SUBMIT_DIR" in training
+    assert "QUERYOCC_LAUNCH_PREFLIGHT_ONLY" in training
 
     assert "#SBATCH --gpus-per-node=A100-SXM4-40GB:1" in evaluation
     assert "#SBATCH --constraint=thin" in evaluation
+    assert "#SBATCH --account=berzelius-2026-289" in evaluation
     assert "--trainer.limit-test-batches=1.0" in evaluation
     assert "--evaluation-results-path=" in evaluation
+    assert "SLURM_SUBMIT_DIR" in evaluation
+    assert "QUERYOCC_LAUNCH_PREFLIGHT_ONLY" in evaluation
     assert "--array=10-16" in submission
     assert "afterok:$prepare_job" in submission
     assert "afterok:$smoke_job" in submission
     assert "afterok:$train_job" in submission
     assert "afterok:$evaluation_job" in submission
     assert "select_best_queryocc_checkpoint.py" in selector
+    assert "#SBATCH --account=berzelius-2026-289" in selector
+    assert "SLURM_SUBMIT_DIR" in selector
+    assert "QUERYOCC_LAUNCH_PREFLIGHT_ONLY" in selector
+
+
+def test_production_launchers_resolve_repo_from_slurm_submit_dir(tmp_path: Path):
+    """Exercise production scripts as copies in a fake Slurm spool directory."""
+    import os
+    import shutil
+    import subprocess
+
+    submit_root = tmp_path / "checkout"
+    scripts_dir = submit_root / "scripts"
+    scripts_dir.mkdir(parents=True)
+    project_root = tmp_path / "project"
+    infos_root = project_root / "infos"
+    converted_root = project_root / "converted"
+    infos_root.mkdir(parents=True)
+    converted_root.mkdir(parents=True)
+    (converted_root / "full_training_preflight.json").write_text("{}")
+    (converted_root / "full_training_blacklist.json").write_text("[]")
+    (infos_root / "queryocc-refined_infos_train.pkl").write_bytes(b"ready")
+    (infos_root / "queryocc-refined_infos_val.pkl").write_bytes(b"ready")
+    (scripts_dir / "env.local.sh").write_text(
+        f"PROJECT_ROOT={project_root}\n"
+        f"OUTPUT_DIR={project_root}\n"
+        f"NUSC_INFOS_ROOT={infos_root}\n"
+        f"QUERYOCC_CONVERTED_ROOT={converted_root}\n"
+    )
+
+    spool_dir = tmp_path / "var" / "lib" / "slurm" / "slurmd" / "job123"
+    spool_dir.mkdir(parents=True)
+    env = {
+        **os.environ,
+        "SLURM_SUBMIT_DIR": str(submit_root),
+        "SLURM_JOB_ID": "123",
+        "SLURM_ARRAY_TASK_ID": "10",
+        "TRAIN_JOB_ID": "123",
+        "QUERYOCC_LAUNCH_PREFLIGHT_ONLY": "1",
+    }
+    expected = {
+        "train_queryocc_full_berzelius.sh": "full-training launch preflight passed",
+        "evaluate_queryocc_full_berzelius.sh": "full-validation launch preflight passed",
+        "select_queryocc_best_berzelius.sh": "selector launch preflight passed",
+    }
+    for launcher, message in expected.items():
+        spool_script = spool_dir / launcher
+        shutil.copy2(ROOT / "scripts" / launcher, spool_script)
+        result = subprocess.run(
+            ["bash", str(spool_script)],
+            env=env,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert result.returncode == 0, result.stderr
+        assert message in result.stdout
 
 
 def test_checkpoint_summary_requires_exact_global_step(tmp_path: Path):

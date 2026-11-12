@@ -9,7 +9,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --time=01:00:00
 #SBATCH --output=/proj/agp/users/%u/logs/%j.out
-#SBATCH --account=berzelius-2026-281
+#SBATCH --account=berzelius-2026-289
 #SBATCH --job-name=queryocc_occ3d_smoke
 
 set -euo pipefail
