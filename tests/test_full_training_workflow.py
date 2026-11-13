@@ -74,6 +74,9 @@ def test_checkpoint_manifest_finds_nested_recovery_checkpoint(tmp_path):
     scheduled_root.mkdir(parents=True)
     recovery_root.mkdir(parents=True)
     (timestamp_root / "config.yml").write_text("trainer:\n  max_epochs: 16\n")
+    stray_rank_root = run_root / "2026-11-12_172411"
+    stray_rank_root.mkdir()
+    (stray_rank_root / "config.yml").write_text("rank: stray\n")
 
     for epoch, global_step in ((10, 10490), (11, 11539)):
         torch.save(
@@ -95,6 +98,7 @@ def test_checkpoint_manifest_finds_nested_recovery_checkpoint(tmp_path):
     manifest = build_manifest(run_root, (10, 11), output, "job")
 
     assert output.is_file()
+    assert manifest["config"] == str((timestamp_root / "config.yml").resolve())
     assert manifest["checkpoints"]["10"]["path"].endswith("epoch-10.ckpt")
     assert manifest["recovery_checkpoint"]["path"].endswith(
         "queryocc/run-id/checkpoints/last.ckpt"

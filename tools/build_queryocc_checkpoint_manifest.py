@@ -18,11 +18,13 @@ def _only(paths: list[Path], description: str) -> Path:
 
 def build_manifest(run_root: Path, epochs: tuple[int, ...], output: Path, training_job_id: str) -> dict:
     checkpoints = {}
+    training_roots = set()
     for epoch in epochs:
         path = _only(
             sorted(run_root.rglob(f"checkpoints/epoch-{epoch:02d}.ckpt")),
             f"epoch {epoch} checkpoint",
         )
+        training_roots.add(path.parent.parent)
         checkpoint = torch.load(path, map_location="cpu", weights_only=False, mmap=True)
         stored_epoch = int(checkpoint["epoch"])
         if stored_epoch != epoch - 1:
@@ -33,11 +35,17 @@ def build_manifest(run_root: Path, epochs: tuple[int, ...], output: Path, traini
             "bytes": path.stat().st_size,
         }
 
-    recovery = _only(sorted(run_root.rglob("checkpoints/last.ckpt")), "recovery checkpoint")
+    training_root = _only(sorted(training_roots), "checkpoint training root")
+    recovery = _only(
+        sorted(training_root.rglob("checkpoints/last.ckpt")),
+        "recovery checkpoint",
+    )
     recovery_payload = torch.load(recovery, map_location="cpu", weights_only=False, mmap=True)
     if int(recovery_payload["epoch"]) != max(epochs) - 1:
         raise RuntimeError(f"{recovery}: recovery checkpoint is not from the final epoch")
-    config_path = _only(sorted(run_root.rglob("config.yml")), "training config")
+    config_path = training_root / "config.yml"
+    if not config_path.is_file():
+        raise RuntimeError(f"Expected training config at {config_path}")
     payload = {
         "schema_version": 1,
         "training_job_id": training_job_id,
