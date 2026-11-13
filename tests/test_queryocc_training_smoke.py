@@ -306,7 +306,7 @@ def test_queryocc_full_berzelius_resource_and_dependency_workflow():
 
     assert "#SBATCH --gpus-per-node=A100-SXM4-40GB:1" in evaluation
     assert "#SBATCH --constraint=thin" in evaluation
-    assert "#SBATCH --account=berzelius-2026-289" in evaluation
+    assert "#SBATCH --account=berzelius-2026-281" in evaluation
     assert "--trainer.limit-test-batches=1.0" in evaluation
     assert "--evaluation-results-path=" in evaluation
     assert "SLURM_SUBMIT_DIR" in evaluation
@@ -317,7 +317,7 @@ def test_queryocc_full_berzelius_resource_and_dependency_workflow():
     assert "afterok:$train_job" in submission
     assert "afterok:$evaluation_job" in submission
     assert "select_best_queryocc_checkpoint.py" in selector
-    assert "#SBATCH --account=berzelius-2026-289" in selector
+    assert "#SBATCH --account=berzelius-2026-281" in selector
     assert "SLURM_SUBMIT_DIR" in selector
     assert "QUERYOCC_LAUNCH_PREFLIGHT_ONLY" in selector
 

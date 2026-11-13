@@ -6,7 +6,7 @@
 #SBATCH --mem=4G
 #SBATCH --time=00:15:00
 #SBATCH --output=/proj/agp/users/%u/logs/%j.out
-#SBATCH --account=berzelius-2026-289
+#SBATCH --account=berzelius-2026-281
 #SBATCH --job-name=queryocc_select
 #
 

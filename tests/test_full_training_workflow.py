@@ -3,6 +3,7 @@ import pickle
 from types import SimpleNamespace
 
 import numpy as np
+import pytest
 
 from generate_pseudo_labels.constants import CAMERA_ORDER
 from tools.prepare_queryocc_full_training import prepare
@@ -60,6 +61,44 @@ def test_full_preflight_writes_blacklist_and_filtered_infos(tmp_path):
     assert [record["token"] for record in filtered["infos"]] == ["valid"]
     blacklist = json.loads((converted / "full_training_blacklist.json").read_text())
     assert blacklist["records"][0]["token"] == "empty"
+
+
+def test_checkpoint_manifest_finds_nested_recovery_checkpoint(tmp_path):
+    torch = pytest.importorskip("torch")
+    from tools.build_queryocc_checkpoint_manifest import build_manifest
+
+    run_root = tmp_path / "queryocc-nusc-full16-job"
+    timestamp_root = run_root / "2026-11-12_172358"
+    scheduled_root = timestamp_root / "checkpoints"
+    recovery_root = timestamp_root / "queryocc" / "run-id" / "checkpoints"
+    scheduled_root.mkdir(parents=True)
+    recovery_root.mkdir(parents=True)
+    (timestamp_root / "config.yml").write_text("trainer:\n  max_epochs: 16\n")
+
+    for epoch, global_step in ((10, 10490), (11, 11539)):
+        torch.save(
+            {"epoch": epoch - 1, "global_step": global_step},
+            scheduled_root / f"epoch-{epoch:02d}.ckpt",
+        )
+    torch.save(
+        {
+            "epoch": 10,
+            "global_step": 11539,
+            "optimizer_states": [{}],
+            "lr_schedulers": [{}],
+            "loops": {},
+        },
+        recovery_root / "last.ckpt",
+    )
+
+    output = run_root / "checkpoint_manifest.json"
+    manifest = build_manifest(run_root, (10, 11), output, "job")
+
+    assert output.is_file()
+    assert manifest["checkpoints"]["10"]["path"].endswith("epoch-10.ckpt")
+    assert manifest["recovery_checkpoint"]["path"].endswith(
+        "queryocc/run-id/checkpoints/last.ckpt"
+    )
 
 
 def test_semantic_rayiou_selector_requires_all_results_and_links_best(tmp_path):

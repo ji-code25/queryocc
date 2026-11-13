@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=5
 #SBATCH --time=12:00:00
 #SBATCH --output=/proj/agp/users/%u/logs/%A_%a.out
-#SBATCH --account=berzelius-2026-289
+#SBATCH --account=berzelius-2026-281
 #SBATCH --job-name=queryocc_fullval
 #
 
